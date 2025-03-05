@@ -29,7 +29,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 add_subdirectory(lib/SDL-main EXCLUDE_FROM_ALL)
 
 # Добавление исполняемых файлов
-add_executable (${PROJECT_NAME}  "./src/main.cpp")
+file(GLOB SRC "./src/*")
+message("Findes sources ${SRC}")
+add_executable (${PROJECT_NAME} ${SRC})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Haste_n_Slash PROPERTY CXX_STANDARD 20)
