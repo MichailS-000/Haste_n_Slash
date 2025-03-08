@@ -1,2 +1,0 @@
-E:/Projects/Kursa4/Haste_n_Slash/lib/rapidjson-1.1.0/test/CMakeFiles/ALL_BUILD.dir
-E:/Projects/Kursa4/Haste_n_Slash/lib/rapidjson-1.1.0/test/CMakeFiles/ZERO_CHECK.dir
