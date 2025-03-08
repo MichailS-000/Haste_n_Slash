@@ -1,0 +1,12 @@
+{
+    "Resources":
+    {
+        "pic1":
+        {
+            "type":"full screen image",
+            "resolution":"128x72",
+            "source":"resources/pictures/ttt.bmp",
+            "extension":"BMP"
+        }
+    }
+}

@@ -3,6 +3,10 @@
 set(PROJECT_NAME Haste_n_Slash)
 project (${PROJECT_NAME})
 
+if(MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
+endif(MSVC)
+
 # Установить путь для исходного кода lua
 set(LUA_SRC lib/lua-5.4.7)
 
@@ -29,15 +33,15 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 add_subdirectory(lib/SDL-main EXCLUDE_FROM_ALL)
 
 # Добавление исполняемых файлов
-file(GLOB SRC "./src/*")
-message("Findes sources ${SRC}")
-add_executable (${PROJECT_NAME} ${SRC})
+file(GLOB_RECURSE SRC_CPP "./src/*.cpp")
+file(GLOB_RECURSE SRC_HPP "./src/*.hpp")
+message("Findes sources: ${SRC_CPP} ${SRC_HPP}")
+add_executable (${PROJECT_NAME} ${SRC_CPP} ${SRC_HPP})
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET Haste_n_Slash PROPERTY CXX_STANDARD 20)
-endif()
+# Копирование файлов ресурсов
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}"./resources" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources) 
 
 # Линковка библиотек с проектом
 target_link_libraries(${PROJECT_NAME} PRIVATE lua luacpp_static SDL3::SDL3)
-target_include_directories(${PROJECT_NAME} PRIVATE lib/entt-master/src/entt)
-target_include_directories(${PROJECT_NAME} PRIVATE lib/rapidjson-master/include/rapidjson)
+target_include_directories(${PROJECT_NAME} PRIVATE lib/entt-master/src)
+target_include_directories(${PROJECT_NAME} PRIVATE lib/rapidjson-1.1.0/include)
