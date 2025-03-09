@@ -22,11 +22,7 @@ target_include_directories(lua PUBLIC ${LUA_SRC}/src)
 set(LUA_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/${LUA_SRC}/src)
 set(LUA_LIBRARIES lua)
 
-# Добавление luacpp
-add_subdirectory(lib/luacpp-master)
-
 # Добавление SDL
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
@@ -38,10 +34,23 @@ file(GLOB_RECURSE SRC_HPP "./src/*.hpp")
 message("Findes sources: ${SRC_CPP} ${SRC_HPP}")
 add_executable (${PROJECT_NAME} ${SRC_CPP} ${SRC_HPP})
 
-# Копирование файлов ресурсов
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}"./resources" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources) 
-
 # Линковка библиотек с проектом
-target_link_libraries(${PROJECT_NAME} PRIVATE lua luacpp_static SDL3::SDL3)
+target_link_libraries(${PROJECT_NAME} PRIVATE lua SDL3::SDL3)
+target_include_directories(${PROJECT_NAME} PRIVATE lib/LuaBridge3-master/Source)
 target_include_directories(${PROJECT_NAME} PRIVATE lib/entt-master/src)
 target_include_directories(${PROJECT_NAME} PRIVATE lib/rapidjson-1.1.0/include)
+
+# Копирование ресурсов после сборки
+
+file(GLOB_RECURSE RESOURCE_FILES ${PROJECT_SOURCE_DIR}/resources/*)
+
+# Создаем кастомную цель для копирования ресурсов
+add_custom_target(copy_resources ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_SOURCE_DIR}/resources
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources
+    COMMENT "Copying resources..."
+)
+
+# Делаем так, чтобы цель LuaExample зависела от копирования ресурсов
+add_dependencies(${PROJECT_NAME} copy_resources)
