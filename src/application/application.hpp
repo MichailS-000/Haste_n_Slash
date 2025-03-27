@@ -5,7 +5,6 @@
 #include "../renderer/renderer.hpp"
 #include "../resources/resources_loader.hpp"
 #include "../scripts/scripts_manager.hpp"
-#include "../input_manager/input_manager.hpp"
 #include "../haste_n_slash.hpp"
 
 class Application

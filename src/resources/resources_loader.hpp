@@ -2,7 +2,6 @@
 
 #include "../haste_n_slash.hpp"
 #include <string>
-#include "resource_container.hpp"
 
 class ResourcesLoader
 {

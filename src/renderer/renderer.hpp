@@ -1,10 +1,9 @@
 #pragma once
-#include <SDL3/SDL.h>
+
 #include <string>
 #include <map>
 #include <memory>
 #include <entt/entt.hpp>
-#include "../components/graphic.hpp"
 #include "../resources/resource_container.hpp"
 class Renderer
 {
