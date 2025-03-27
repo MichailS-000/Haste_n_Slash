@@ -357,6 +357,7 @@ dep_option(SDL_X11_XRANDR          "Enable Xrandr support" "${SDL_X11_XRANDR_DEF
 dep_option(SDL_X11_XSCRNSAVER      "Enable Xscrnsaver support" ON SDL_X11 OFF)
 dep_option(SDL_X11_XSHAPE          "Enable XShape support" ON SDL_X11 OFF)
 dep_option(SDL_X11_XSYNC           "Enable Xsync support" ON SDL_X11 OFF)
+dep_option(SDL_X11_XTEST           "Enable XTest support" ON SDL_X11 OFF)
 dep_option(SDL_WAYLAND             "Use Wayland video driver" ${UNIX_SYS} "SDL_VIDEO" OFF)
 dep_option(SDL_WAYLAND_SHARED      "Dynamically load Wayland support" ON "SDL_WAYLAND;SDL_DEPS_SHARED" OFF)
 dep_option(SDL_WAYLAND_LIBDECOR    "Use client-side window decorations on Wayland" ON "SDL_WAYLAND" OFF)
@@ -1978,6 +1979,7 @@ elseif(WINDOWS)
   check_include_file(audioclient.h HAVE_AUDIOCLIENT_H)
   check_include_file(sensorsapi.h HAVE_SENSORSAPI_H)
   check_include_file(shellscalingapi.h HAVE_SHELLSCALINGAPI_H)
+  check_include_file(shobjidl_core.h HAVE_SHOBJIDL_CORE_H)
   check_c_source_compiles("
     #include <windows.h>
     #include <mfapi.h>
