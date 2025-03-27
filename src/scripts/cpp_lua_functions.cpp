@@ -13,9 +13,6 @@ void LinkEntityLib(lua_State* state, ExecutionEnviroment* env)
 			{
 				return (int)env->applicationRegistry->create();
 			})
-		.addFunction("addComponent", [env = env](std::string componentName, int entity)
-			{
-			})
 		.addFunction("setImage", [env = env](std::string imageName, int entity) 
 			{
 				auto img = env->resourcesContainer->GetImageInst(imageName);
