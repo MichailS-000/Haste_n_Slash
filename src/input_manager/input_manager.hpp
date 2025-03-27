@@ -7,8 +7,8 @@ class InputManager
 {
 private:
 	enum KeyPos { No, Down, Press, Up };
-	std::map<std::string, SDL_Scancode> registredKeys;
-	std::map < SDL_Scancode, KeyPos > keysState;
+	std::map <std::string, SDL_Scancode> registredKeys;
+	std::map <SDL_Scancode, KeyPos> keysState;
 public:
 	bool GetKeyUp(std::string&& key);
 	bool GetKeyUp(SDL_Scancode key);

@@ -1,4 +1,6 @@
 #include "application.hpp"
+#include "../logger/logger.hpp"
+
 
 void GetResolutionFromString(std::string resolution, uint16_t* widthPtr, uint16_t* heightPtr)
 {
@@ -8,6 +10,8 @@ void GetResolutionFromString(std::string resolution, uint16_t* widthPtr, uint16_
 
 Application::Application()
 {
+	Logger::Log("Application started!");
+
 	inputManager = new InputManager();
 	loader = new ResourcesLoader();
 	resources = new ResourceContainer();
@@ -30,13 +34,14 @@ Application::Application()
 	scriptsManager->CompileScripts();
 
 	components::Script script = scriptsManager->GetScriptInst("menuScript");
-	auto entity = registry.create();
+	entt::entity entity = registry.create();
 	registry.emplace<components::Script>(entity, script);
 }
 
 Application::~Application()
 {
 	SDL_DestroyWindow(window);
+	Logger::Log("Application terminated!");
 }
 
 void Application::Run()
