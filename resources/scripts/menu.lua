@@ -1,4 +1,4 @@
 function Start()
 	local entt = entity.addEntity()
-    entity.addComponent(entt, "image")
+    entity.setImage("pic1", entt)
 end

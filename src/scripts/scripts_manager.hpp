@@ -7,11 +7,11 @@ class ScriptsManager
 {
 private:
 	std::map<std::string, components::Script> scripts;
-	ExecutationEnviroment* scriptsEnv;
+	ExecutionEnviroment* scriptsEnv;
 	SCRIPT_BINARY_PERMISSIONS_TYPE ParsePermissions(std::vector<std::string>& permissions);
 	void LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PERMISSIONS_TYPE permisssions);
 public:
-	ScriptsManager(ExecutationEnviroment* env);
+	ScriptsManager(ExecutionEnviroment* env);
 	~ScriptsManager();
 	void UpdateScripts();
 	components::Script GetScriptInst(std::string&& scriptName);

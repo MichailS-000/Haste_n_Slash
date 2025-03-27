@@ -14,7 +14,7 @@
 /// <param name="heightPtr"></param>
 extern void GetResolutionFromString(std::string resolution, uint16_t* widthPtr, uint16_t* heightPtr);
 
-struct ExecutationEnviroment
+struct ExecutionEnviroment
 {
 	InputManager* input;
 	entt::registry* applicationRegistry;

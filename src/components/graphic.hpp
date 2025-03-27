@@ -6,7 +6,9 @@ namespace components
 {
 	enum ImageType
 	{
-		FullScreen
+		FullScreen,
+		PositionOrented,
+		UI
 	};
 
 	struct Image

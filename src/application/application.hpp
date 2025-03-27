@@ -11,7 +11,7 @@
 class Application
 {
 private:
-	ExecutationEnviroment env;
+	ExecutionEnviroment env;
 	InputManager* inputManager;
 	ScriptsManager* scriptsManager;
 	ResourceContainer* resources;

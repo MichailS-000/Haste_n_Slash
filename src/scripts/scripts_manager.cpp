@@ -1,5 +1,7 @@
 #include "scripts_manager.hpp"
 #include "../components/script.hpp"
+#include "cpp_lua_functions.hpp"
+
 #include <lua.hpp>
 #include <LuaBridge/LuaBridge.h>
 #include <unordered_map>
@@ -33,24 +35,11 @@ void ScriptsManager::LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PER
 
 	if (permisssions | components::ScriptPermissions::Entity)
 	{
-		luabridge::getGlobalNamespace(state)
-			.beginNamespace("entity")
-			.addFunction("addEntity", [env = scriptsEnv]() 
-				{
-					return (int)env->applicationRegistry->create();
-				})
-			.addFunction("addComponent", [env = scriptsEnv](int entity, std::string component) 
-				{
-					if (component == "image")
-					{
-						env->applicationRegistry->emplace<components::Image>(entt::to_entity(entity));
-					}
-				})
-			.endNamespace();
+		LinkEntityLib(state, scriptsEnv);
 	}
 }
 
-ScriptsManager::ScriptsManager(ExecutationEnviroment* env) : scriptsEnv(env)
+ScriptsManager::ScriptsManager(ExecutionEnviroment* env) : scriptsEnv(env)
 {
 }
 
@@ -69,6 +58,7 @@ void ScriptsManager::UpdateScripts()
 	for (auto entity : view)
 	{
 		scriptsEnv->currentUpdatingEntity = entity;
+
 		components::Script& script = view.get<components::Script>(entity);
 		
 		if ((script.permissions & components::ScriptPermissions::StartFunction) && script.initState == 0)
