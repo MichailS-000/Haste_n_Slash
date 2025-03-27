@@ -1,12 +1,22 @@
 {
-    "Resources":
-    {
-        "pic1":
-        {
-            "type":"full screen image",
-            "resolution":"128x72",
-            "source":"resources/pictures/ttt.bmp",
-            "extension":"BMP"
-        }
-    }
+	"Resources":
+	{
+		"pic1":
+		{
+			"type": "image",
+			"resolution": "128x72",
+			"source": "resources/pictures/ttt.bmp"
+		},
+		"menuScript":
+		{
+			"type": "script",
+			"permissions":
+			[
+				"image",
+				"start",
+				"entity"
+			],
+			"source": "resources/scripts/menu.lua"
+		}
+	}
 }
