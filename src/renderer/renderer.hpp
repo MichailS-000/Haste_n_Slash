@@ -5,7 +5,7 @@
 #include <memory>
 #include <entt/entt.hpp>
 #include "../components/graphic.hpp"
-
+#include "../resources/resource_container.hpp"
 class Renderer
 {
 private:
@@ -13,6 +13,7 @@ private:
 	SDL_Renderer* renderer;
 public:
 	void UpdateRenderer(const entt::registry& registry);
+	void LoadTextures(ResourceContainer* container);
 	Renderer(SDL_Window* window);
 	~Renderer();
 };

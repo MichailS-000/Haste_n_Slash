@@ -41,6 +41,11 @@ void Renderer::UpdateRenderer(const entt::registry& registry)
 	SDL_RenderPresent(renderer);
 }
 
+void Renderer::LoadTextures(ResourceContainer* container)
+{
+
+}
+
 Renderer::Renderer(SDL_Window* window)
 {
 	renderer = SDL_CreateRenderer(window, NULL);
