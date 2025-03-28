@@ -5,6 +5,9 @@ digraph IncludeHierarchy {
   bgcolor="#222831";
   node [shape=box, style=filled, fillcolor="#76ABAE", fontsize=10];
   edge [color="#EEEEEE"];
+  "program_time.cpp" -> "program_time.hpp";
+  "program_time.cpp" -> "SDL.h";
+  "application.cpp" -> "program_time.hpp";
   "application.cpp" -> "logger.hpp";
   "application.cpp" -> "application.hpp";
   "application.cpp" -> "script.hpp";
@@ -18,11 +21,6 @@ digraph IncludeHierarchy {
   "components.hpp" -> "camera.hpp";
   "components.hpp" -> "graphic.hpp";
   "components.hpp" -> "script.hpp";
-  "scripts_manager.hpp" -> "ScriptsExecutionEnviroment.hpp";
-  "scripts_manager.hpp" -> "compiled_script.hpp";
-  "input_manager.hpp" -> "map";
-  "input_manager.hpp" -> "string";
-  "input_manager.hpp" -> "SDL.h";
   "graphic.hpp" -> "string";
   "scripts_manager.cpp" -> "scripts_manager.hpp";
   "scripts_manager.cpp" -> "script.hpp";
@@ -33,6 +31,11 @@ digraph IncludeHierarchy {
   "scripts_manager.cpp" -> "LuaBridge.h";
   "input_manager.cpp" -> "input_manager.hpp";
   "script.hpp" -> "string";
+  "scripts_manager.hpp" -> "ScriptsExecutionEnviroment.hpp";
+  "scripts_manager.hpp" -> "compiled_script.hpp";
+  "input_manager.hpp" -> "map";
+  "input_manager.hpp" -> "string";
+  "input_manager.hpp" -> "SDL.h";
   "logger.cpp" -> "ctime";
   "logger.cpp" -> "logger.hpp";
   "logger.cpp" -> "chrono";
@@ -70,8 +73,9 @@ digraph IncludeHierarchy {
   "resource_container.cpp" -> "resource_container.hpp";
   "resource_container.cpp" -> "format";
   "cpp_lua_functions.cpp" -> "lua.hpp";
+  "cpp_lua_functions.cpp" -> "components.hpp";
   "cpp_lua_functions.cpp" -> "cpp_lua_functions.hpp";
-  "cpp_lua_functions.cpp" -> "graphic.hpp";
+  "cpp_lua_functions.cpp" -> "program_time.hpp";
   "cpp_lua_functions.cpp" -> "LuaBridge.h";
   "cpp_lua_functions.hpp" -> "ScriptsExecutionEnviroment.hpp";
   "cpp_lua_functions.hpp" -> "lua.hpp";

@@ -2,6 +2,7 @@
 
 #include "../logger/logger.hpp"
 #include "../components/script.hpp"
+#include "program_time.hpp"
 
 Application::Application()
 {
@@ -65,6 +66,8 @@ void Application::Run()
 
 	while (!close)
 	{
+		Time::Update();
+
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{

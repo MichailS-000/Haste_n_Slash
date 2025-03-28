@@ -1,9 +1,25 @@
 #include "cpp_lua_functions.hpp"
 
 #include "../components/components.hpp"
+#include "../application/program_time.hpp"
 
 #include <LuaBridge/LuaBridge.h>
 #include <lua.hpp>
+
+void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
+{
+	luabridge::getGlobalNamespace(state)
+		.beginNamespace("time")
+		.addFunction("getTime", []() 
+			{
+				return Time::GetTime();
+			})
+		.addFunction("getDeltaTime", []()
+			{
+				return Time::GetDeltaTime();
+			})
+		.endNamespace();
+}
 
 void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {

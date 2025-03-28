@@ -39,6 +39,7 @@ SCRIPT_BINARY_PERMISSIONS_TYPE ScriptsManager::ParsePermissions(std::vector<std:
 void ScriptsManager::LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PERMISSIONS_TYPE permisssions)
 {
 	luaL_openlibs(state);
+	LinkGenericLib(state, scriptsEnv);
 
 	if (permisssions | ScriptPermissions::Entity)
 	{
