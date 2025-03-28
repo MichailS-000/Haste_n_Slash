@@ -1,4 +1,3 @@
 function Start()
-	local entt = entity.addEntity()
-    entity.setImage("pic1", entt)
+	graphics.addBackground("pic1")
 end

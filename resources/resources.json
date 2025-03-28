@@ -4,7 +4,6 @@
 		"pic1":
 		{
 			"type": "image",
-			"resolution": "128x72",
 			"source": "resources/pictures/ttt.bmp"
 		},
 		"menuScript":
@@ -12,7 +11,7 @@
 			"type": "script",
 			"permissions":
 			[
-				"image",
+				"graphics",
 				"start",
 				"entity"
 			],

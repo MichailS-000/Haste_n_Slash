@@ -29,8 +29,11 @@ Application::Application()
 
 	loader->LoadResources(resources);
 
-	renderer = new Renderer(window);
+	renderer = new Renderer(window, &registry);
 	Logger::Log("Renderer created!");
+
+	renderer->LoadTextures(resources);
+	Logger::Log("Images loaded into video memory");
 
 	env = {}; 
 	env.applicationRegistry = &registry;

@@ -16,7 +16,8 @@ SCRIPT_BINARY_PERMISSIONS_TYPE ScriptsManager::ParsePermissions(std::vector<std:
         {"start", components::ScriptPermissions::StartFunction},
         {"update", components::ScriptPermissions::UpdateFunction},
         {"entity", components::ScriptPermissions::Entity},
-        {"input", components::ScriptPermissions::Input}
+        {"input", components::ScriptPermissions::Input},
+		{"graphics", components::ScriptPermissions::Graphics}
     };
 
     for (const auto& permission : permissions)
@@ -42,6 +43,10 @@ void ScriptsManager::LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PER
 	if (permisssions | components::ScriptPermissions::Entity)
 	{
 		LinkEntityLib(state, scriptsEnv);
+	}
+	if (permisssions | components::ScriptPermissions::Graphics)
+	{
+		LinkGraphicsLib(state, scriptsEnv);
 	}
 }
 

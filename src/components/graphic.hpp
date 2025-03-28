@@ -1,22 +1,17 @@
 #pragma once
-#include <SDL3/SDL.h>
 #include <string>
 
 namespace components
 {
-	enum ImageType
+	struct Sprite
 	{
-		FullScreen,
-		PositionOrented,
-		UI
+		std::string textureName = "null";
+		float scaleX = 1;
+		float scaleY = 1;
 	};
 
-	struct Image
+	struct Background
 	{
-		std::string name;
-		ImageType type = ImageType::FullScreen;
-		SDL_Surface* surface = nullptr;
-		uint16_t width = 100;
-		uint16_t height = 100;
+		std::string textureName = "null";
 	};
 }

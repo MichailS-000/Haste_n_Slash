@@ -1,6 +1,7 @@
 #include "resources_loader.hpp"
 
 #include "../logger/logger.hpp"
+#include "../renderer/image.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -47,12 +48,6 @@ SDL_Surface* ResourcesLoader::loadSurface(const std::string& filename)
 	return nullptr;
 }
 
-void ResourcesLoader::GetResolutionFromString(std::string resolution, uint16_t* widthPtr, uint16_t* heightPtr)
-{
-	*widthPtr = atoi(resolution.substr(0, resolution.find('x')).c_str());
-	*heightPtr = atoi(resolution.substr(resolution.find('x') + 1, 2).c_str());
-}
-
 StartupOptions ResourcesLoader::LoadStartupOptions()
 {
 	rapidjson::Document resourcesDocument;
@@ -96,10 +91,9 @@ int ResourcesLoader::LoadResources(ResourceContainer* container)
 
 			if (resource.value["type"] == "image")
 			{
-				components::Image image;
+				Image image;
 				image.name = resourceName;
 				image.surface = loadSurface(resource.value["source"].GetString());
-				GetResolutionFromString(resource.value["resolution"].GetString(), &image.width, &image.height);
 
 				container->AddImage(image);
 			}

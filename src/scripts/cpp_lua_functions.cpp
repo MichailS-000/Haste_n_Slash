@@ -13,14 +13,21 @@ void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 			{
 				return (int)env->applicationRegistry->create();
 			})
-		.addFunction("setImage", [env = env](std::string imageName, int entity) 
-			{
-				auto img = env->resourcesContainer->GetImageInst(imageName);
-				env->applicationRegistry->emplace<components::Image>(static_cast<entt::entity>(entity), img);
-			})
 		.endNamespace();
 }
 
 void LinkInputLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
+}
+
+void LinkGraphicsLib(lua_State* state, ScriptsExecutionEnviroment* env)
+{
+	luabridge::getGlobalNamespace(state)
+		.beginNamespace("graphics")
+		.addFunction("addBackground", [env = env](std::string textureName) 
+			{
+				entt::entity entity = env->applicationRegistry->create();
+				env->applicationRegistry->emplace<components::Background>(entity, textureName);
+			})
+		.endNamespace();
 }
