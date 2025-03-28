@@ -13,11 +13,30 @@ void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 			{
 				return (int)env->applicationRegistry->create();
 			})
+		.addFunction("addScriptToEntity", [env = env](std::string scriptName, int entity) 
+			{
+				
+			})
 		.endNamespace();
 }
 
 void LinkInputLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
+	luabridge::getGlobalNamespace(state)
+		.beginNamespace("input")
+		.addFunction("getKeyDown", [env = env](std::string key)
+			{
+				return env->input->GetKeyDown(std::move(key));
+			})
+		.addFunction("getKey", [env = env](std::string key)
+			{
+				return env->input->GetKey(std::move(key));
+			})
+		.addFunction("ketKeyUp", [env = env](std::string key)
+			{
+				return env->input->GetKeyUp(std::move(key));
+			})
+		.endNamespace();
 }
 
 void LinkGraphicsLib(lua_State* state, ScriptsExecutionEnviroment* env)

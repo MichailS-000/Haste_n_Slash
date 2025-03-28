@@ -13,11 +13,11 @@ SCRIPT_BINARY_PERMISSIONS_TYPE ScriptsManager::ParsePermissions(std::vector<std:
     SCRIPT_BINARY_PERMISSIONS_TYPE permissionsBinary = 0;
 
     static const std::unordered_map<std::string, SCRIPT_BINARY_PERMISSIONS_TYPE> permissionMap = {
-        {"start", components::ScriptPermissions::StartFunction},
-        {"update", components::ScriptPermissions::UpdateFunction},
-        {"entity", components::ScriptPermissions::Entity},
-        {"input", components::ScriptPermissions::Input},
-		{"graphics", components::ScriptPermissions::Graphics}
+        {"start", ScriptPermissions::StartFunction},
+        {"update", ScriptPermissions::UpdateFunction},
+        {"entity", ScriptPermissions::Entity},
+        {"input", ScriptPermissions::Input},
+		{"graphics", ScriptPermissions::Graphics}
     };
 
     for (const auto& permission : permissions)
@@ -40,13 +40,17 @@ void ScriptsManager::LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PER
 {
 	luaL_openlibs(state);
 
-	if (permisssions | components::ScriptPermissions::Entity)
+	if (permisssions | ScriptPermissions::Entity)
 	{
 		LinkEntityLib(state, scriptsEnv);
 	}
-	if (permisssions | components::ScriptPermissions::Graphics)
+	if (permisssions | ScriptPermissions::Graphics)
 	{
 		LinkGraphicsLib(state, scriptsEnv);
+	}
+	if (permisssions | ScriptPermissions::Input)
+	{
+		LinkInputLib(state, scriptsEnv);
 	}
 }
 
@@ -70,24 +74,20 @@ void ScriptsManager::UpdateScripts()
 	{
 		scriptsEnv->currentUpdatingEntity = entity;
 
-		components::Script& script = view.get<components::Script>(entity);
+		components::Script& scriptRef = view.get<components::Script>(entity);
+		CompiledScript& script = scripts[scriptRef.name];
 		
-		if ((script.permissions & components::ScriptPermissions::StartFunction) && script.initState == 0)
+		if ((script.permissions & ScriptPermissions::StartFunction) && scriptRef.initState == 0)
 		{
 			CallFunction("Start", script.state);
-			script.initState = 1;
+			scriptRef.initState = 1;
 		}
 		
-		if (script.permissions & components::ScriptPermissions::UpdateFunction)
+		if (script.permissions & ScriptPermissions::UpdateFunction)
 		{
 			CallFunction("Update", script.state);
 		}
 	}
-}
-
-components::Script ScriptsManager::GetScriptInst(std::string&& scriptName)
-{
-	return scripts[scriptName];
 }
 
 void ScriptsManager::CallFunction(const char* functionName, lua_State* state)
@@ -119,7 +119,7 @@ void ScriptsManager::CompileScripts()
 
 	while ((uncompiledScript = scriptsEnv->resourcesContainer->GetNextUncompiledScript()) != nullptr)
 	{
-		components::Script script;
+		CompiledScript script;
 		script.name = uncompiledScript->name;
 		script.permissions = ParsePermissions(uncompiledScript->permissions);
 		script.state = luaL_newstate();

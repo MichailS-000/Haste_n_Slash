@@ -1,5 +1,7 @@
 #include "application.hpp"
+
 #include "../logger/logger.hpp"
+#include "../components/script.hpp"
 
 Application::Application()
 {
@@ -45,9 +47,10 @@ Application::Application()
 	Logger::Log("Scripts manager created!");
 	scriptsManager->CompileScripts();
 
-	components::Script script = scriptsManager->GetScriptInst("menuScript");
 	entt::entity entity = registry.create();
-	registry.emplace<components::Script>(entity, script);
+	components::Script menuScript;
+	menuScript.name = "menuScript";
+	registry.emplace<components::Script>(entity, menuScript);
 }
 
 Application::~Application()
