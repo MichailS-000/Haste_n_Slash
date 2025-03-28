@@ -1,6 +1,6 @@
 #include "cpp_lua_functions.hpp"
 
-#include "../components/graphic.hpp"
+#include "../components/components.hpp"
 
 #include <LuaBridge/LuaBridge.h>
 #include <lua.hpp>
@@ -15,7 +15,9 @@ void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 			})
 		.addFunction("addScriptToEntity", [env = env](std::string scriptName, int entity) 
 			{
-				
+				components::Script script;
+				script.name = scriptName;
+				env->applicationRegistry->emplace<components::Script>((entt::entity)entity, script);
 			})
 		.endNamespace();
 }

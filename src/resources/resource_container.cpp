@@ -6,13 +6,13 @@
 void ResourceContainer::AddImage(Image& img)
 {
 	images.push(new Image(img));
-	Logger::Log(std::format("Image {} loaded", img.name));
+	Logger::Log(std::format("Image \"{}\" loaded", img.name));
 }
 
 void ResourceContainer::AddUncompiledScript(UncompiledScript& script)
 {
 	uncompiledScripts.push(new UncompiledScript(script));
-	Logger::Log(std::format("Script {} loaded", script.name));
+	Logger::Log(std::format("Script \"{}\" loaded", script.name));
 }
 
 Image* ResourceContainer::GetNextImage()

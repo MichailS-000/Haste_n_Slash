@@ -16,6 +16,16 @@
 				"entity"
 			],
 			"source": "resources/scripts/menu.lua"
+		},
+		"testUpdate":
+		{
+			"type": "script",
+			"permissions":
+			[
+				"update",
+				"input"
+			],
+			"source": "resources/scripts/testUpdate.lua"
 		}
 	}
 }

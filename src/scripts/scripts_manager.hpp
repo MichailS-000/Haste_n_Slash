@@ -13,6 +13,6 @@ public:
 	ScriptsManager(ScriptsExecutionEnviroment* env);
 	~ScriptsManager();
 	void UpdateScripts();
-	void CallFunction(const char* functionName, lua_State* state);
+	bool CallFunction(const char* functionName, lua_State* state);
 	void CompileScripts();
 };

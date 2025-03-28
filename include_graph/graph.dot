@@ -7,6 +7,7 @@ digraph IncludeHierarchy {
   edge [color="#EEEEEE"];
   "application.cpp" -> "logger.hpp";
   "application.cpp" -> "application.hpp";
+  "application.cpp" -> "script.hpp";
   "application.hpp" -> "renderer.hpp";
   "application.hpp" -> "resources_loader.hpp";
   "application.hpp" -> "input_manager.hpp";
@@ -18,7 +19,7 @@ digraph IncludeHierarchy {
   "components.hpp" -> "graphic.hpp";
   "components.hpp" -> "script.hpp";
   "scripts_manager.hpp" -> "ScriptsExecutionEnviroment.hpp";
-  "scripts_manager.hpp" -> "script.hpp";
+  "scripts_manager.hpp" -> "compiled_script.hpp";
   "input_manager.hpp" -> "map";
   "input_manager.hpp" -> "string";
   "input_manager.hpp" -> "SDL.h";
@@ -32,7 +33,6 @@ digraph IncludeHierarchy {
   "scripts_manager.cpp" -> "LuaBridge.h";
   "input_manager.cpp" -> "input_manager.hpp";
   "script.hpp" -> "string";
-  "script.hpp" -> "lua.hpp";
   "logger.cpp" -> "ctime";
   "logger.cpp" -> "logger.hpp";
   "logger.cpp" -> "chrono";
@@ -63,6 +63,7 @@ digraph IncludeHierarchy {
   "resources_loader.cpp" -> "image.hpp";
   "resources_loader.cpp" -> "iostream";
   "resources_loader.cpp" -> "fstream";
+  "compiled_script.hpp" -> "lua.hpp";
   "resources_loader.hpp" -> "startup_options.hpp";
   "resources_loader.hpp" -> "resource_container.hpp";
   "resource_container.cpp" -> "logger.hpp";

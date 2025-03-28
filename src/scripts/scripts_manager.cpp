@@ -76,21 +76,39 @@ void ScriptsManager::UpdateScripts()
 
 		components::Script& scriptRef = view.get<components::Script>(entity);
 		CompiledScript& script = scripts[scriptRef.name];
+
+		if (script.name == "null")
+		{
+			Logger::LogError(3, std::format("Script \"{}\" does not exist or not presented in resources.json", scriptRef.name));
+			scriptsEnv->applicationRegistry->erase<components::Script>(entity);
+			continue;
+		}
 		
 		if ((script.permissions & ScriptPermissions::StartFunction) && scriptRef.initState == 0)
 		{
-			CallFunction("Start", script.state);
-			scriptRef.initState = 1;
+			if (CallFunction("Start", script.state))
+			{
+				scriptRef.initState = 1;
+			}
+			else
+			{
+				Logger::Log(std::format("Error trace when Start function called from \"{}\" entityID: {}", script.name, (int)entity));
+				scriptsEnv->applicationRegistry->erase<components::Script>(entity);
+			}
 		}
 		
 		if (script.permissions & ScriptPermissions::UpdateFunction)
 		{
-			CallFunction("Update", script.state);
+			if (!CallFunction("Update", script.state))
+			{
+				Logger::Log(std::format("Error trace when Update function called from \"{}\" entityID: {}", script.name, (int)entity));
+				scriptsEnv->applicationRegistry->erase<components::Script>(entity);
+			}
 		}
 	}
 }
 
-void ScriptsManager::CallFunction(const char* functionName, lua_State* state)
+bool ScriptsManager::CallFunction(const char* functionName, lua_State* state)
 {
 	try
 	{
@@ -106,11 +124,15 @@ void ScriptsManager::CallFunction(const char* functionName, lua_State* state)
 	catch (luabridge::LuaException& e)
 	{
 		Logger::LogError(3, e.what());
+		return false;
 	}
 	catch (std::runtime_error& e)
 	{
 		Logger::LogError(3, e.what());
+		return false;
 	}
+
+	return true;
 }
 
 void ScriptsManager::CompileScripts()
@@ -125,7 +147,21 @@ void ScriptsManager::CompileScripts()
 		script.state = luaL_newstate();
 		LinkScriptsDependencies(script.state, script.permissions);
 
-		luaL_dofile(script.state, uncompiledScript->sourcePath.c_str());
+		if (luaL_dofile(script.state, uncompiledScript->sourcePath.c_str()) != 0)
+		{
+			if (lua_isstring(script.state, lua_gettop(script.state)))
+			{
+				std::string error = lua_tostring(script.state, lua_gettop(script.state));
+				lua_pop(script.state, 1);
+				Logger::LogError(3, std::format("Error while lua dofile: {}", error));
+				continue;
+			}
+			else
+			{
+				Logger::LogError(3, std::format("Error while lua dofile: unknown error"));
+			}
+		}
+
 		scripts.emplace(script.name, script);
 
 		delete uncompiledScript;
