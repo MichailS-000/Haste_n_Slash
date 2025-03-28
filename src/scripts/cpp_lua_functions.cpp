@@ -25,6 +25,10 @@ void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
 	luabridge::getGlobalNamespace(state)
 		.beginNamespace("entity")
+		.addFunction("getCurrentEntity", [env = env] 
+			{
+				return (int)env->currentUpdatingEntity;
+			})
 		.addFunction("addEntity", [env = env]() 
 			{
 				return (int)env->applicationRegistry->create();
@@ -34,6 +38,10 @@ void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 				components::Script script;
 				script.name = scriptName;
 				env->applicationRegistry->emplace<components::Script>((entt::entity)entity, script);
+			})
+		.addFunction("destroyEntity", [env = env](int entity) 
+			{
+				env->applicationRegistry->destroy((entt::entity)entity);
 			})
 		.endNamespace();
 }

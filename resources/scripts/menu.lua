@@ -1,3 +1,4 @@
+
 function Start()
 	graphics.addBackground("pic1")
 	local entt = entity.addEntity()

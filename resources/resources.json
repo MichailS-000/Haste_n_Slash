@@ -23,7 +23,8 @@
 			"permissions":
 			[
 				"update",
-				"input"
+				"input",
+				"entity"
 			],
 			"source": "resources/scripts/testUpdate.lua"
 		}
