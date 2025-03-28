@@ -1,4 +1,7 @@
 #include "resources_loader.hpp"
+
+#include "../logger/logger.hpp"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -7,33 +10,25 @@
 
 rapidjson::Document LoadDocument(const char* fileName)
 {
-	try
+	std::ifstream stream(fileName);
+	if (!stream.is_open())
 	{
-		std::ifstream stream(fileName);
-		if (!stream.is_open())
-		{
-			stream.close();
-			throw std::exception();
-		}
-
-		std::stringstream sstream;
-		sstream << stream.rdbuf();
 		stream.close();
-
-		rapidjson::Document resourcesDocument;
-
-		if (resourcesDocument.Parse(sstream.str().c_str()).HasParseError())
-		{
-			//throw std::exception(std::format("Json document parse error {} at {}", resourcesDocument.GetParseError(), fileName).c_str());
-		}
-
-		return resourcesDocument;
-
+		throw std::exception();
 	}
-	catch (const std::exception& e)
+
+	std::stringstream sstream;
+	sstream << stream.rdbuf();
+	stream.close();
+
+	rapidjson::Document resourcesDocument;
+
+	if (resourcesDocument.Parse(sstream.str().c_str()).HasParseError())
 	{
-		std::cout << e.what() << std::endl;
+		throw std::runtime_error(std::format("Json document parse error {} at {}", fileName, resourcesDocument.GetErrorOffset()).c_str());
 	}
+
+	return resourcesDocument;
 }
 
 SDL_Surface* ResourcesLoader::loadSurface(const std::string& filename)
@@ -46,7 +41,7 @@ SDL_Surface* ResourcesLoader::loadSurface(const std::string& filename)
 	}
 	else
 	{
-		throw std::exception(std::string("Image format dont supported: " + format).c_str());
+		throw std::runtime_error(std::string("Image format dont supported: " + format).c_str());
 	}
 
 	return nullptr;
@@ -54,7 +49,16 @@ SDL_Surface* ResourcesLoader::loadSurface(const std::string& filename)
 
 StartupOptions ResourcesLoader::LoadStartupOptions()
 {
-	rapidjson::Document resourcesDocument = LoadDocument("resources/options.json");
+	rapidjson::Document resourcesDocument;
+
+	try
+	{
+		resourcesDocument = LoadDocument("resources/options.json");
+	}
+	catch (const std::runtime_error& e)
+	{
+		Logger::LogError(1, e.what());
+	}
 
 	StartupOptions options
 	{
@@ -76,36 +80,43 @@ ResourcesLoader::~ResourcesLoader()
 
 int ResourcesLoader::LoadResources(ResourceContainer* container)
 {
-	auto resourcesDocument = LoadDocument("resources/resources.json");
-
-	for (auto& resource : resourcesDocument["Resources"].GetObject())
+	try
 	{
-		std::string resourceName = resource.name.GetString();
-		
-		if (resource.value["type"] == "image")
-		{
-			components::Image image;
-			image.name = resourceName;
-			image.surface = loadSurface(resource.value["source"].GetString());
-			GetResolutionFromString(resource.value["resolution"].GetString(), &image.width, &image.height);
-		
-			container->AddImage(image);
-		}
-		else if (resource.value["type"] == "script")
-		{
-			UncompiledScript script;
-			script.name = resourceName;
-			script.sourcePath = resource.value["source"].GetString();
+		auto resourcesDocument = LoadDocument("resources/resources.json");
 
-			auto permissionsArray = resource.value["permissions"].GetArray();
+		for (auto& resource : resourcesDocument["Resources"].GetObject())
+		{
+			std::string resourceName = resource.name.GetString();
 
-			for (auto& permission : permissionsArray)
+			if (resource.value["type"] == "image")
 			{
-				script.permissions.push_back(permission.GetString());
-			}
+				components::Image image;
+				image.name = resourceName;
+				image.surface = loadSurface(resource.value["source"].GetString());
+				GetResolutionFromString(resource.value["resolution"].GetString(), &image.width, &image.height);
 
-			container->AddUncompiledScript(script);
+				container->AddImage(image);
+			}
+			else if (resource.value["type"] == "script")
+			{
+				UncompiledScript script;
+				script.name = resourceName;
+				script.sourcePath = resource.value["source"].GetString();
+
+				auto permissionsArray = resource.value["permissions"].GetArray();
+
+				for (auto& permission : permissionsArray)
+				{
+					script.permissions.push_back(permission.GetString());
+				}
+
+				container->AddUncompiledScript(script);
+			}
 		}
+	}
+	catch (const std::runtime_error& e)
+	{
+		Logger::LogError(1, e.what());
 	}
 
 	return 0;

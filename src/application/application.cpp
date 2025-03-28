@@ -13,16 +13,31 @@ Application::Application()
 	Logger::Log("Application started!");
 
 	inputManager = new InputManager();
+	Logger::Log("Input manager created!");
+
 	loader = new ResourcesLoader();
+	Logger::Log("Resources loader created!");
+
 	resources = new ResourceContainer();
+	Logger::Log("Resources container created!");
 
 	StartupOptions options = loader->LoadStartupOptions();
+	Logger::Log("Startup options loaded!");
 
 	window = SDL_CreateWindow("Haste & Slash", options.windowWidth, options.windowHeight, SDL_WINDOW_OPENGL);
+	if (window)
+	{
+		Logger::Log("Window created!");
+	}
+	else
+	{
+		Logger::LogError(34, "Window creation error");
+	}
 
 	loader->LoadResources(resources);
 
 	renderer = new Renderer(window);
+	Logger::Log("Renderer created!");
 
 	env = {}; 
 	env.applicationRegistry = &registry;
@@ -31,6 +46,7 @@ Application::Application()
 	env.resourcesContainer = resources;
 
 	scriptsManager = new ScriptsManager(&env);
+	Logger::Log("Scripts manager created!");
 	scriptsManager->CompileScripts();
 
 	components::Script script = scriptsManager->GetScriptInst("menuScript");

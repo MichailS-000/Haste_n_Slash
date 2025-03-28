@@ -1,8 +1,5 @@
 #pragma once
 
-#include <map>
-#include <string>
-#include <SDL3/SDL.h>
 #include <entt/entt.hpp>
 #include "resources/resource_container.hpp"
 #include "input_manager/input_manager.hpp"

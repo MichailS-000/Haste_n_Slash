@@ -18,7 +18,7 @@ list(REMOVE_ITEM LUA_SOURCES ${LUA_SRC}/src/lua.c ${LUA_SRC}/src/luac.c)
 add_library(lua STATIC ${LUA_SOURCES})
 target_include_directories(lua PUBLIC ${LUA_SRC}/src)
 
-# Установка значений для luacpp
+# Установка значений для luabridge
 set(LUA_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/${LUA_SRC}/src)
 set(LUA_LIBRARIES lua)
 

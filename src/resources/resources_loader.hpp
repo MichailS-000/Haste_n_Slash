@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../haste_n_slash.hpp"
-#include <string>
 
 class ResourcesLoader
 {

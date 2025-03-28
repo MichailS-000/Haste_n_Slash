@@ -1,11 +1,8 @@
 #pragma once
-#include <SDL3/SDL.h>
-#include <entt/entt.hpp>
 
 #include "../renderer/renderer.hpp"
 #include "../resources/resources_loader.hpp"
 #include "../scripts/scripts_manager.hpp"
-#include "../haste_n_slash.hpp"
 
 class Application
 {

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <map>
-#include <memory>
 #include <entt/entt.hpp>
 #include "../resources/resource_container.hpp"
 class Renderer

@@ -1,10 +1,13 @@
 #include "scripts_manager.hpp"
+
 #include "../components/script.hpp"
+#include "../logger/logger.hpp"
 #include "cpp_lua_functions.hpp"
 
 #include <lua.hpp>
 #include <LuaBridge/LuaBridge.h>
 #include <unordered_map>
+#include <format>
 
 SCRIPT_BINARY_PERMISSIONS_TYPE ScriptsManager::ParsePermissions(std::vector<std::string>& permissions)
 {
@@ -24,6 +27,10 @@ SCRIPT_BINARY_PERMISSIONS_TYPE ScriptsManager::ParsePermissions(std::vector<std:
         {
             permissionsBinary |= it->second;
         }
+		else
+		{
+			Logger::LogWarning(1, std::format("Permission \"{}\" dont registred", permission));
+		}
     }
 
     return permissionsBinary;
@@ -89,12 +96,16 @@ void ScriptsManager::CallFunction(const char* functionName, lua_State* state)
 
 		if (res.hasFailed())
 		{
-			std::cout << "Lua error " << res.errorCode() << ": " << res.errorMessage() << std::endl;
+			throw std::runtime_error(std::format("Lua error {}\n{}", res.errorCode().value(), res.errorMessage()));
 		}
 	}
 	catch (luabridge::LuaException& e)
 	{
-		std::cout << e.what() << std::endl;
+		Logger::LogError(3, e.what());
+	}
+	catch (std::runtime_error& e)
+	{
+		Logger::LogError(3, e.what());
 	}
 }
 
