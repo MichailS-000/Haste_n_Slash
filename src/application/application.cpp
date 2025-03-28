@@ -1,13 +1,6 @@
 #include "application.hpp"
 #include "../logger/logger.hpp"
 
-
-void GetResolutionFromString(std::string resolution, uint16_t* widthPtr, uint16_t* heightPtr)
-{
-	*widthPtr = atoi(resolution.substr(0, resolution.find('x')).c_str());
-	*heightPtr = atoi(resolution.substr(resolution.find('x') + 1, 2).c_str());
-}
-
 Application::Application()
 {
 	Logger::Log("Application started!");

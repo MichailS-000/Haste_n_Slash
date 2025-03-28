@@ -3,7 +3,7 @@
 #include <lua.hpp>
 #include <string>
 
-#define SCRIPT_BINARY_PERMISSIONS_TYPE Uint16
+#define SCRIPT_BINARY_PERMISSIONS_TYPE unsigned short
 
 namespace components
 {

@@ -3,11 +3,12 @@
 #include "../renderer/renderer.hpp"
 #include "../resources/resources_loader.hpp"
 #include "../scripts/scripts_manager.hpp"
+#include "../input_manager/input_manager.hpp"
 
 class Application
 {
 private:
-	ExecutionEnviroment env;
+	ScriptsExecutionEnviroment env;
 	InputManager* inputManager;
 	ScriptsManager* scriptsManager;
 	ResourceContainer* resources;

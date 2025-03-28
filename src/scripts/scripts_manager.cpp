@@ -4,7 +4,6 @@
 #include "../logger/logger.hpp"
 #include "cpp_lua_functions.hpp"
 
-#include <lua.hpp>
 #include <LuaBridge/LuaBridge.h>
 #include <unordered_map>
 #include <format>
@@ -46,7 +45,7 @@ void ScriptsManager::LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PER
 	}
 }
 
-ScriptsManager::ScriptsManager(ExecutionEnviroment* env) : scriptsEnv(env)
+ScriptsManager::ScriptsManager(ScriptsExecutionEnviroment* env) : scriptsEnv(env)
 {
 }
 

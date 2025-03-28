@@ -5,7 +5,7 @@
 #include <LuaBridge/LuaBridge.h>
 #include <lua.hpp>
 
-void LinkEntityLib(lua_State* state, ExecutionEnviroment* env)
+void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
 	luabridge::getGlobalNamespace(state)
 		.beginNamespace("entity")
@@ -21,6 +21,6 @@ void LinkEntityLib(lua_State* state, ExecutionEnviroment* env)
 		.endNamespace();
 }
 
-void LinkInputLib(lua_State* state, ExecutionEnviroment* env)
+void LinkInputLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
 }

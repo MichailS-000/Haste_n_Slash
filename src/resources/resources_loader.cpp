@@ -47,6 +47,12 @@ SDL_Surface* ResourcesLoader::loadSurface(const std::string& filename)
 	return nullptr;
 }
 
+void ResourcesLoader::GetResolutionFromString(std::string resolution, uint16_t* widthPtr, uint16_t* heightPtr)
+{
+	*widthPtr = atoi(resolution.substr(0, resolution.find('x')).c_str());
+	*heightPtr = atoi(resolution.substr(resolution.find('x') + 1, 2).c_str());
+}
+
 StartupOptions ResourcesLoader::LoadStartupOptions()
 {
 	rapidjson::Document resourcesDocument;
