@@ -1,5 +1,5 @@
 #pragma once
-#include "../application/ScriptsExecutionEnviroment.hpp"
+#include "../application/scripts_execution_enviroment.hpp"
 #include "compiled_script.hpp"
 
 class ScriptsManager

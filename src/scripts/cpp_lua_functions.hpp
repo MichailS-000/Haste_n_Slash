@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../application/ScriptsExecutionEnviroment.hpp"
+#include "../application/scripts_execution_enviroment.hpp"
 #include <lua.hpp>
 
 extern void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env);
