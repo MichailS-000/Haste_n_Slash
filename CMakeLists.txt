@@ -27,7 +27,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
 add_subdirectory(lib/SDL-main EXCLUDE_FROM_ALL)
-
+add_subdirectory(lib/SDL_image-main EXCLUDE_FROM_ALL)
+ 
 # Добавление исполняемых файлов
 file(GLOB_RECURSE SRC_CPP "./src/*.cpp")
 file(GLOB_RECURSE SRC_HPP "./src/*.hpp")
