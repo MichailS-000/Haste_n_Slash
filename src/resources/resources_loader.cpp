@@ -7,7 +7,9 @@
 #include <iostream>
 #include <sstream>
 #include <format>
+#include <filesystem>
 #include <rapidjson/document.h>
+#include <SDL3_image/SDL_image.h>
 
 rapidjson::Document LoadDocument(const char* fileName)
 {
@@ -34,18 +36,37 @@ rapidjson::Document LoadDocument(const char* fileName)
 
 SDL_Surface* ResourcesLoader::loadSurface(const std::string& filename)
 {
+	if (!std::filesystem::exists(filename))
+	{
+		throw std::runtime_error(std::format("File {} does not exists", filename));
+	}
+
 	std::string format = filename.substr(filename.find('.'), filename.size() - filename.find('.'));
+	SDL_Surface* img;
 
 	if (format == ".bmp")
 	{
-		return SDL_LoadBMP(filename.c_str());
+		img = SDL_LoadBMP(filename.c_str());
+	}
+	else if (format == ".png")
+	{
+		img = IMG_Load(filename.c_str());
+	}
+	else if (format == ".jpeg")
+	{
+		img = IMG_Load(filename.c_str());
 	}
 	else
 	{
 		throw std::runtime_error(std::string("Image format dont supported: " + format).c_str());
 	}
 
-	return nullptr;
+	if (img == NULL)
+	{
+		throw std::runtime_error(std::format("Image loading error: {}", filename));
+	}
+
+	return img;
 }
 
 StartupOptions ResourcesLoader::LoadStartupOptions()
