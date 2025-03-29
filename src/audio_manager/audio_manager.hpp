@@ -6,5 +6,5 @@ class AudioManager
 {
 private:
 	ResourceContainer* container;
-
+	Mix_Music* currentPlayngMusic;
 };
