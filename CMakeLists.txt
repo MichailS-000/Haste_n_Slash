@@ -27,7 +27,22 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
 add_subdirectory(lib/SDL-main EXCLUDE_FROM_ALL)
+
+set(SDLIMAGE_VENDORED ON)
+set(SDLIMAGE_AVIF OFF)	# disable formats we don't use to make the build faster and smaller.
+set(SDLIMAGE_BMP OFF)
+set(SDLIMAGE_JPEG OFF)
+set(SDLIMAGE_WEBP OFF)
+set(SDLIMAGE_TIF OFF)
 add_subdirectory(lib/SDL_image-main EXCLUDE_FROM_ALL)
+
+set(SDLMIXER_MIDI_NATIVE OFF)     # disable formats we don't use to make the build faster and smaller. Also some of these don't work on all platforms so you'll need to do some experimentation.
+set(SDLMIXER_GME OFF)
+set(SDLMIXER_WAVPACK OFF)     
+set(SDLMIXER_MOD OFF)
+set(SDLMIXER_OPUS OFF)
+set(SDLMIXER_VENDORED ON)   # tell SDL_mixer to build its own dependencies
+add_subdirectory(lib/SDL_mixer-main EXCLUDE_FROM_ALL)
  
 # Добавление исполняемых файлов
 file(GLOB_RECURSE SRC_CPP "./src/*.cpp")
@@ -36,7 +51,13 @@ message("Findes sources: ${SRC_CPP} ${SRC_HPP}")
 add_executable (${PROJECT_NAME} ${SRC_CPP} ${SRC_HPP})
 
 # Линковка библиотек с проектом
-target_link_libraries(${PROJECT_NAME} PRIVATE lua SDL3::SDL3)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+SDL3_mixer::SDL3_mixer
+SDL3_image::SDL3_image
+lua
+SDL3::SDL3
+)
+
 target_include_directories(${PROJECT_NAME} PRIVATE lib/LuaBridge3-master/Source)
 target_include_directories(${PROJECT_NAME} PRIVATE lib/entt-master/src)
 target_include_directories(${PROJECT_NAME} PRIVATE lib/rapidjson-1.1.0/include)
