@@ -58,6 +58,11 @@
 					"name": "SDLIMAGE_AVIF",
 					"value": "False",
 					"type": "BOOL"
+				},
+				{
+					"name": "SDLIMAGE_TIF",
+					"value": "False",
+					"type": "BOOL"
 				}
 			]
 		}
