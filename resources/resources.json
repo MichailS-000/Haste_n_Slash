@@ -11,6 +11,17 @@
 			"type": "image",
 			"source": "resources/pictures/aboba.png"
 		},
+		"song1":
+		{
+			"type": "music",
+			"group": "background",
+			"source": "resources/SFX/song18.mp3"
+		},
+		"SFX1":
+		{
+			"type": "sound",
+			"source": "resources/SFX/beltHandle1.ogg"
+		},
 		"menuScript":
 		{
 			"type": "script",

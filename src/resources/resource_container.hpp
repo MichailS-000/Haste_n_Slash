@@ -18,14 +18,14 @@ private:
 public:
 	void AddImage(Image& img);
 	void AddUncompiledScript(UncompiledScript& script);
-	void AddMusic(Mix_Music* musicTrack, std::string& groupName);
-	void AddSound(Mix_Chunk* sound, std::string& soundName);
+	void AddMusic(Mix_Music* musicTrack, const std::string& groupName);
+	void AddSound(Mix_Chunk* sound, const std::string& soundName);
 
 	Image* GetNextImage();
 	UncompiledScript* GetNextUncompiledScript();
 
-	Mix_Music* GetMusicTrack(std::string& groupName);
-	Mix_Chunk* GetSound(std::string& soundName);
+	Mix_Music* GetMusicTrack(const std::string& groupName);
+	Mix_Chunk* GetSound(const std::string& soundName);
 
 	ResourceContainer();
 	~ResourceContainer();

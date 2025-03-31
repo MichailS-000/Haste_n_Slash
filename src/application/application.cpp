@@ -6,6 +6,9 @@
 
 Application::Application()
 {
+	SDL_Init(SDL_INIT_AUDIO);
+	Mix_OpenAudio(0, NULL);
+
 	Logger::Log("Application started!");
 
 	inputManager = new InputManager();
@@ -38,6 +41,8 @@ Application::Application()
 	renderer->LoadTextures(resources);
 	Logger::Log("Images loaded into video memory");
 
+	audio = new AudioManager(resources);
+
 	env = {}; 
 	env.applicationRegistry = &registry;
 	env.currentUpdatingEntity = entt::null;
@@ -52,6 +57,8 @@ Application::Application()
 	components::Script menuScript;
 	menuScript.name = "menuScript";
 	registry.emplace<components::Script>(entity, menuScript);
+
+	audio->StartPlayMusicGroup("background");
 }
 
 Application::~Application()

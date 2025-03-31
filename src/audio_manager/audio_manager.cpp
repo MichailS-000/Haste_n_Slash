@@ -2,7 +2,6 @@
 
 AudioManager::AudioManager(ResourceContainer* container) : container(container)
 {
-	SDL_Init(SDL_INIT_AUDIO);
 }
 
 AudioManager::~AudioManager()
@@ -10,15 +9,17 @@ AudioManager::~AudioManager()
 	Mix_CloseAudio();
 }
 
-void AudioManager::PlaySoundOneShot(std::string& soundName)
+void AudioManager::PlaySoundOneShot(const std::string& soundName)
 {
 	Mix_PlayChannel(-1, container->GetSound(soundName), 0);
 }
 
-void AudioManager::StartPlayLocalMusic(std::string& music)
+void AudioManager::StartPlayMusicGroup(const std::string& group)
 {
+	Mix_PlayMusic(container->GetMusicTrack(group), 0);
 }
 
-void AudioManager::StopPlayingLocalMusic()
+void AudioManager::StopPlayingMusic()
 {
+	Mix_FadeOutMusic(1000);
 }

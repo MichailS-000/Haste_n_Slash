@@ -15,19 +15,14 @@ void ResourceContainer::AddUncompiledScript(UncompiledScript& script)
 	Logger::Log(std::format("Script \"{}\" loaded", script.name));
 }
 
-void ResourceContainer::AddMusic(Mix_Music* musicTrack, std::string& trackName)
+void ResourceContainer::AddMusic(Mix_Music* musicTrack, const std::string& groupName)
 {
-	if (music.contains(trackName))
-	{
-		Logger::LogWarning(4, std::format("Musical track \"{}\" already exists", trackName));
-	}
-	else
-	{
-		music.emplace(trackName, musicTrack);
-	}
+	musicGroups[groupName].push_back(musicTrack);
+
+	Logger::Log(std::format("New track added to group \"{}\"", groupName));
 }
 
-void ResourceContainer::AddSound(Mix_Chunk* sound, std::string& soundName)
+void ResourceContainer::AddSound(Mix_Chunk* sound, const std::string& soundName)
 {
 	if (sounds.contains(soundName))
 	{
@@ -37,6 +32,8 @@ void ResourceContainer::AddSound(Mix_Chunk* sound, std::string& soundName)
 	{
 		sounds.emplace(soundName, sound);
 	}
+
+	Logger::Log(std::format("SFX \"{}\" loaded", soundName));
 }
 
 Image* ResourceContainer::GetNextImage()
@@ -69,7 +66,7 @@ UncompiledScript* ResourceContainer::GetNextUncompiledScript()
 	}
 }
 
-Mix_Music* ResourceContainer::GetMusicTrack(std::string& groupName)
+Mix_Music* ResourceContainer::GetMusicTrack(const std::string& groupName)
 {
 	if (musicGroups[groupName].size() > 0)
 	{
@@ -82,7 +79,7 @@ Mix_Music* ResourceContainer::GetMusicTrack(std::string& groupName)
 	}
 }
 
-Mix_Chunk* ResourceContainer::GetSound(std::string& soundName)
+Mix_Chunk* ResourceContainer::GetSound(const std::string& soundName)
 {
 	if (sounds.contains(soundName))
 	{
@@ -102,14 +99,14 @@ ResourceContainer::ResourceContainer()
 ResourceContainer::~ResourceContainer()
 {
 	Mix_FadeOutMusic(1000);
-	for (auto [groupName, group] : musicGroups)
+	for (auto& [groupName, group] : musicGroups)
 	{
 		for (auto track : group)
 		{
 			Mix_FreeMusic(track);
 		}
 	}
-	for (auto [soundName, sound] : sounds)
+	for (auto& [soundName, sound] : sounds)
 	{
 		Mix_FreeChunk(sound);
 	}
