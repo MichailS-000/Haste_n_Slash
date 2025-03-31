@@ -12,7 +12,9 @@ public:
 	void PlaySoundOneShot(const std::string& soundName);
 	void StartPlayMusicGroup(const std::string& group);
 	void StopPlayingMusic();
+	void NextTrack();
 private:
 	ResourceContainer* container;
-	Mix_Music* currentPlayngMusic;
+	Mix_Music* currentMusic;
+	std::string currentMusicGroup;
 };

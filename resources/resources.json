@@ -17,6 +17,18 @@
 			"group": "background",
 			"source": "resources/SFX/song18.mp3"
 		},
+		"song2":
+		{
+			"type": "music",
+			"group": "background",
+			"source": "resources/SFX/mystical.mp3"
+		},
+		"song3":
+		{
+			"type": "music",
+			"group": "background",
+			"source": "resources/SFX/story_time.ogg"
+		},
 		"SFX1":
 		{
 			"type": "sound",
@@ -40,7 +52,8 @@
 			[
 				"update",
 				"input",
-				"entity"
+				"entity",
+				"audio"
 			],
 			"source": "resources/scripts/testUpdate.lua"
 		}

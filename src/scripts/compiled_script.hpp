@@ -10,7 +10,8 @@ enum ScriptPermissions
 	UpdateFunction = 0b10,
 	Input = 0b100,
 	Entity = 0b1000,
-	Graphics = 0b10000
+	Graphics = 0b10000,
+	Audio = 0b100000
 };
 
 struct CompiledScript
