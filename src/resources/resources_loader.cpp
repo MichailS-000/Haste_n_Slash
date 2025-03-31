@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <rapidjson/document.h>
 #include <SDL3_image/SDL_image.h>
+#include <SDL3_mixer/SDL_mixer.h>
 
 rapidjson::Document LoadDocument(const char* fileName)
 {
@@ -132,6 +133,29 @@ int ResourcesLoader::LoadResources(ResourceContainer* container)
 				}
 
 				container->AddUncompiledScript(script);
+			}
+			else if (resource.value["type"] == "music")
+			{
+				Mix_Music* music = Mix_LoadMUS(resource.value["source"].GetString());
+				if (music == NULL)
+				{
+					Logger::LogError(1, std::format("\"{}\" decoding error: {}", resourceName, SDL_GetError()));
+					continue;
+				}
+
+				std::string group = resource.value["group"].GetString();
+				container->AddMusic(music, group);
+			}
+			else if (resource.value["type"] == "sound")
+			{
+				Mix_Chunk* sound = Mix_LoadWAV(resource.value["source"].GetString());
+				if (sound == NULL)
+				{
+					Logger::LogError(1, std::format("\"{}\" decoding error: {}", resourceName, SDL_GetError()));
+					continue;
+				}
+
+				container->AddSound(sound, resourceName);
 			}
 		}
 	}

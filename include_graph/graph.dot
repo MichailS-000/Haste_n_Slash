@@ -15,13 +15,6 @@ digraph IncludeHierarchy {
   "application.hpp" -> "resources_loader.hpp";
   "application.hpp" -> "input_manager.hpp";
   "application.hpp" -> "scripts_manager.hpp";
-  "ScriptsExecutionEnviroment.hpp" -> "entt.hpp";
-  "ScriptsExecutionEnviroment.hpp" -> "resource_container.hpp";
-  "ScriptsExecutionEnviroment.hpp" -> "input_manager.hpp";
-  "components.hpp" -> "camera.hpp";
-  "components.hpp" -> "graphic.hpp";
-  "components.hpp" -> "script.hpp";
-  "graphic.hpp" -> "string";
   "scripts_manager.cpp" -> "scripts_manager.hpp";
   "scripts_manager.cpp" -> "script.hpp";
   "scripts_manager.cpp" -> "logger.hpp";
@@ -31,7 +24,14 @@ digraph IncludeHierarchy {
   "scripts_manager.cpp" -> "LuaBridge.h";
   "input_manager.cpp" -> "input_manager.hpp";
   "script.hpp" -> "string";
-  "scripts_manager.hpp" -> "ScriptsExecutionEnviroment.hpp";
+  "scripts_execution_enviroment.hpp" -> "entt.hpp";
+  "scripts_execution_enviroment.hpp" -> "resource_container.hpp";
+  "scripts_execution_enviroment.hpp" -> "input_manager.hpp";
+  "components.hpp" -> "camera.hpp";
+  "components.hpp" -> "graphic.hpp";
+  "components.hpp" -> "script.hpp";
+  "graphic.hpp" -> "string";
+  "scripts_manager.hpp" -> "scripts_execution_enviroment.hpp";
   "scripts_manager.hpp" -> "compiled_script.hpp";
   "input_manager.hpp" -> "map";
   "input_manager.hpp" -> "string";
@@ -58,14 +58,16 @@ digraph IncludeHierarchy {
   "renderer.hpp" -> "entt.hpp";
   "renderer.hpp" -> "resource_container.hpp";
   "renderer.hpp" -> "camera.hpp";
-  "resources_loader.cpp" -> "document.h";
+  "resources_loader.cpp" -> "filesystem";
+  "resources_loader.cpp" -> "resources_loader.hpp";
   "resources_loader.cpp" -> "format";
   "resources_loader.cpp" -> "sstream";
-  "resources_loader.cpp" -> "resources_loader.hpp";
   "resources_loader.cpp" -> "logger.hpp";
   "resources_loader.cpp" -> "image.hpp";
   "resources_loader.cpp" -> "iostream";
   "resources_loader.cpp" -> "fstream";
+  "resources_loader.cpp" -> "document.h";
+  "resources_loader.cpp" -> "SDL_image.h";
   "compiled_script.hpp" -> "lua.hpp";
   "resources_loader.hpp" -> "startup_options.hpp";
   "resources_loader.hpp" -> "resource_container.hpp";
@@ -77,6 +79,7 @@ digraph IncludeHierarchy {
   "cpp_lua_functions.cpp" -> "cpp_lua_functions.hpp";
   "cpp_lua_functions.cpp" -> "program_time.hpp";
   "cpp_lua_functions.cpp" -> "LuaBridge.h";
-  "cpp_lua_functions.hpp" -> "ScriptsExecutionEnviroment.hpp";
+  "cpp_lua_functions.hpp" -> "scripts_execution_enviroment.hpp";
   "cpp_lua_functions.hpp" -> "lua.hpp";
+  "sfx_manager.hpp" -> "SDL_mixer.h";
 }
