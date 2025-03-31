@@ -1,5 +1,5 @@
 # Haste & Slash
-Пошаговая roug-like приключенческая игра
+Проект пошаговой приключенческой Rouge-Like игры
 # How To Build
 ## Dependencies
 1. Cmake
