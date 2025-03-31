@@ -3,6 +3,8 @@
 #include "../logger/logger.hpp"
 #include "../components/script.hpp"
 #include "program_time.hpp"
+#include "../components/generic.hpp"
+#include "../components/graphic.hpp"
 
 Application::Application()
 {
@@ -59,6 +61,12 @@ Application::Application()
 	components::Script menuScript;
 	menuScript.name = "menuScript";
 	registry.emplace<components::Script>(entity, menuScript);
+
+	entt::entity sprite = registry.create();
+	components::Sprite cSprite = {};
+	cSprite.textureName = "frame";
+	registry.emplace<components::Sprite>(entity, cSprite);
+	registry.emplace<components::Position>(entity);
 }
 
 Application::~Application()

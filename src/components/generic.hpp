@@ -4,7 +4,7 @@ namespace components
 {
 	struct Position
 	{
-		float positionX;
-		float positionY;
+		float positionX = 0;
+		float positionY = 0;
 	};
 }

@@ -1,6 +1,7 @@
 #include "renderer.hpp"
 
 #include "../components/graphic.hpp"
+#include "../components/generic.hpp"
 
 #include <iostream>
 
@@ -8,28 +9,56 @@ void Renderer::UpdateRenderer(const entt::registry& registry)
 {
 	SDL_RenderClear(renderer);
 
-	auto view = registry.view<components::Background>();
+	int screenWidth, screenHeight;
+	SDL_GetWindowSize(SDL_GetRenderWindow(renderer), &screenWidth, &screenHeight);
 
-	for (auto [entity, image] : view.each())
 	{
-		int screenWidth, screenHeight;
-		SDL_GetWindowSize(SDL_GetRenderWindow(renderer), &screenWidth, &screenHeight);
-		float imageWidth, imageHeight;
-		SDL_GetTextureSize(textures[image.textureName], &imageWidth, &imageHeight);
+		auto view = registry.view<components::Background>();
 
-		SDL_FRect sourceRect;
-		sourceRect.h = imageHeight;
-		sourceRect.w = imageWidth;
-		sourceRect.x = 0;
-		sourceRect.y = 0;
+		for (auto [entity, image] : view.each())
+		{
+			
+			float imageWidth, imageHeight;
+			SDL_GetTextureSize(textures[image.textureName], &imageWidth, &imageHeight);
 
-		SDL_FRect destinationRect;
-		destinationRect.w =	(screenHeight / imageHeight) * imageWidth;
-		destinationRect.h = screenHeight;
-		destinationRect.x = -(destinationRect.w - screenWidth) / 2;
-		destinationRect.y = 0;
+			SDL_FRect sourceRect;
+			sourceRect.h = imageHeight;
+			sourceRect.w = imageWidth;
+			sourceRect.x = 0;
+			sourceRect.y = 0;
 
-		SDL_RenderTexture(renderer, textures[image.textureName], &sourceRect, &destinationRect);
+			SDL_FRect destinationRect;
+			destinationRect.w = (screenHeight / imageHeight) * imageWidth;
+			destinationRect.h = screenHeight;
+			destinationRect.x = -(destinationRect.w - screenWidth) / 2;
+			destinationRect.y = 0;
+
+			SDL_RenderTexture(renderer, textures[image.textureName], &sourceRect, &destinationRect);
+		}
+	}
+
+	{
+		auto view = registry.view<components::Sprite, components::Position>();
+
+		for (auto [entity, sprite, position] : view.each())
+		{
+			float imageWidth, imageHeight;
+			SDL_GetTextureSize(textures[sprite.textureName], &imageWidth, &imageHeight);
+
+			SDL_FRect sourceRect;
+			sourceRect.h = imageHeight;
+			sourceRect.w = imageWidth;
+			sourceRect.x = 0;
+			sourceRect.y = 0;
+
+			SDL_FRect destinationRect;
+			destinationRect.h = imageHeight * sprite.scaleY * mainCamera->scale;
+			destinationRect.w = imageWidth * sprite.scaleX * mainCamera->scale;
+			destinationRect.x = (position.positionX - mainCamera->posX) * mainCamera->scale - destinationRect.w / 2 + screenWidth / 2;
+			destinationRect.y = (position.positionY - mainCamera->posY) * mainCamera->scale - destinationRect.h / 2 + screenHeight / 2;
+
+			SDL_RenderTexture(renderer, textures[sprite.textureName], &sourceRect, &destinationRect);
+		}
 	}
 
 	SDL_RenderPresent(renderer);
@@ -54,7 +83,7 @@ Renderer::Renderer(SDL_Window* window, entt::registry* registry)
 
 	auto entity = registry->create();
 	registry->emplace<components::Camera>(entity);
-	mainCamera = entity;
+	mainCamera = &registry->get<components::Camera>(entity);
 
 	if (renderer == NULL)
 	{

@@ -11,6 +11,11 @@
 			"type": "image",
 			"source": "resources/pictures/aboba.png"
 		},
+		"frame":
+		{
+			"type": "image",
+			"source": "resources/pictures/Frame.png"
+		},
 		"song1":
 		{
 			"type": "music",
