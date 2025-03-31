@@ -1,5 +1,5 @@
 # Структура проекта
-[SVG Image](./include_graph/graph.svg)
+[Граф включений](./include_graph/graph.svg)
 # Жизненный цикл
 В общем виде жизненный цикл прокраммы выглядит так:
 1. Начало программы
@@ -19,10 +19,10 @@
 13. Очистка выделенной памяти
 14. Конец программы
 # Библиотеки
-1. SDL3
-2. RapidJson
-3. Lua
-4. LuaBridge3
-5. EnTT
-6. SDL_AudioMixer
-7. SDL_Image
+1. [SDL3](https://github.com/libsdl-org/SDL) - вывод графики и обработка ввода
+2. [RapidJson](https://github.com/Tencent/rapidjson) - чтение/запись json файлов
+3. [Lua](https://github.com/lua/lua) - интерпретатор lua
+4. [LuaBridge3](https://github.com/kunitoki/LuaBridge3) - c++ обёртка для работы с lua
+5. [EnTT](https://github.com/skypjack/entt) - реализация ECS паттерна
+6. [SDL_mixer](https://github.com/libsdl-org/SDL_mixer) - загрузка и воспроизведение аудио файлов
+7. [SDL_image](https://github.com/libsdl-org/SDL_image) - загрузка изображений
