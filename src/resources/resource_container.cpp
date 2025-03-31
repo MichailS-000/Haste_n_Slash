@@ -70,7 +70,8 @@ Mix_Music* ResourceContainer::GetMusicTrack(const std::string& groupName)
 {
 	if (musicGroups[groupName].size() > 0)
 	{
-		return musicGroups[groupName][rand() % musicGroups[groupName].size()];
+		int randomTrack = rand() % musicGroups[groupName].size();
+		return musicGroups[groupName][randomTrack];
 	}
 	else
 	{
