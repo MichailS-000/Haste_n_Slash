@@ -16,7 +16,7 @@ void AudioManager::PlaySoundOneShot(const std::string& soundName)
 
 void AudioManager::StartPlayMusicGroup(const std::string& group)
 {
-	Mix_PlayMusic(container->GetMusicTrack(group), 0);
+	Mix_FadeInMusic(container->GetMusicTrack(group), 0, 5000);
 }
 
 void AudioManager::StopPlayingMusic()

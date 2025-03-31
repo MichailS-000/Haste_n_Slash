@@ -11,4 +11,13 @@ function Update()
 	if input.getKeyDown("2") then
 		entity.destroyEntity(entity.getCurrentEntity())
 	end
+	if input.getKeyDown("3") then
+		audio.playSound("SFX1")
+	end
+	if input.getKeyDown("Q") then
+		audio.startPlayMusicGroup("background")
+	end
+	if input.getKeyDown("E") then
+		audio.stopPlayingMusic()
+	end
 end

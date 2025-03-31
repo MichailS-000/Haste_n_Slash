@@ -17,7 +17,8 @@ SCRIPT_BINARY_PERMISSIONS_TYPE ScriptsManager::ParsePermissions(std::vector<std:
         {"update", ScriptPermissions::UpdateFunction},
         {"entity", ScriptPermissions::Entity},
         {"input", ScriptPermissions::Input},
-		{"graphics", ScriptPermissions::Graphics}
+		{"graphics", ScriptPermissions::Graphics},
+		{"audio", ScriptPermissions::Audio},
     };
 
     for (const auto& permission : permissions)
@@ -41,17 +42,21 @@ void ScriptsManager::LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PER
 	luaL_openlibs(state);
 	LinkGenericLib(state, scriptsEnv);
 
-	if (permisssions | ScriptPermissions::Entity)
+	if (permisssions & ScriptPermissions::Entity)
 	{
 		LinkEntityLib(state, scriptsEnv);
 	}
-	if (permisssions | ScriptPermissions::Graphics)
+	if (permisssions & ScriptPermissions::Graphics)
 	{
 		LinkGraphicsLib(state, scriptsEnv);
 	}
-	if (permisssions | ScriptPermissions::Input)
+	if (permisssions & ScriptPermissions::Input)
 	{
 		LinkInputLib(state, scriptsEnv);
+	}
+	if (permisssions & ScriptPermissions::Audio)
+	{
+		LinkAudioLib(state, scriptsEnv);
 	}
 }
 

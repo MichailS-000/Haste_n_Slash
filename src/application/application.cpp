@@ -42,12 +42,14 @@ Application::Application()
 	Logger::Log("Images loaded into video memory");
 
 	audio = new AudioManager(resources);
+	Logger::Log("Audio manager created!");
 
 	env = {}; 
 	env.applicationRegistry = &registry;
 	env.currentUpdatingEntity = entt::null;
 	env.input = inputManager;
 	env.resourcesContainer = resources;
+	env.audio = audio;
 
 	scriptsManager = new ScriptsManager(&env);
 	Logger::Log("Scripts manager created!");
@@ -57,8 +59,6 @@ Application::Application()
 	components::Script menuScript;
 	menuScript.name = "menuScript";
 	registry.emplace<components::Script>(entity, menuScript);
-
-	audio->StartPlayMusicGroup("background");
 }
 
 Application::~Application()

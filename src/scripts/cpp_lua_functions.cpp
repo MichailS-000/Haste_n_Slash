@@ -76,3 +76,22 @@ void LinkGraphicsLib(lua_State* state, ScriptsExecutionEnviroment* env)
 			})
 		.endNamespace();
 }
+
+void LinkAudioLib(lua_State* state, ScriptsExecutionEnviroment* env)
+{
+	luabridge::getGlobalNamespace(state)
+		.beginNamespace("audio")
+		.addFunction("playSound", [audio = env->audio](std::string soundName)
+			{
+				audio->PlaySoundOneShot(soundName);
+			})
+		.addFunction("startPlayMusicGroup", [audio = env->audio](std::string musicGroupName)
+			{
+				audio->StartPlayMusicGroup(musicGroupName);
+			})
+		.addFunction("stopPlayingMusic", [audio = env->audio]()
+			{
+				audio->StopPlayingMusic();
+			})
+		.endNamespace();
+}
