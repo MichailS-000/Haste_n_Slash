@@ -24,5 +24,5 @@
 3. Lua
 4. LuaBridge3
 5. EnTT
-6. SDL_AudioMixer(на данный момент не подключён)
-7. SDL_Image(на данный момент не подключён)
+6. SDL_AudioMixer
+7. SDL_Image
