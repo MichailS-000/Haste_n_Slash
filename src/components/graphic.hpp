@@ -14,4 +14,12 @@ namespace components
 	{
 		std::string textureName = "null";
 	};
+
+	struct AnimatedSprite
+	{
+		std::string textureName = "null";
+		float scaleX = 1;
+		float scaleY = 1;
+		float animationTempo = 1;
+	};
 }

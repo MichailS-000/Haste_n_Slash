@@ -2,6 +2,7 @@
 
 #include "../components/graphic.hpp"
 #include "../components/generic.hpp"
+#include "../application/program_time.hpp"
 
 #include <iostream>
 
@@ -17,7 +18,6 @@ void Renderer::UpdateRenderer(const entt::registry& registry)
 
 		for (auto [entity, image] : view.each())
 		{
-			
 			float imageWidth, imageHeight;
 			SDL_GetTextureSize(textures[image.textureName], &imageWidth, &imageHeight);
 
@@ -54,6 +54,33 @@ void Renderer::UpdateRenderer(const entt::registry& registry)
 			SDL_FRect destinationRect;
 			destinationRect.h = imageHeight * sprite.scaleY * mainCamera->scale;
 			destinationRect.w = imageWidth * sprite.scaleX * mainCamera->scale;
+			destinationRect.x = (position.positionX - mainCamera->posX) * mainCamera->scale - destinationRect.w / 2 + screenWidth / 2;
+			destinationRect.y = (position.positionY - mainCamera->posY) * mainCamera->scale - destinationRect.h / 2 + screenHeight / 2;
+
+			SDL_RenderTexture(renderer, textures[sprite.textureName], &sourceRect, &destinationRect);
+		}
+	}
+
+	{
+		auto view = registry.view<components::AnimatedSprite, components::Position>();
+
+		for (auto [entity, sprite, position] : view.each())
+		{
+			float imageWidth, imageHeight;
+			SDL_GetTextureSize(textures[sprite.textureName], &imageWidth, &imageHeight);
+
+			int animationDuration = imageWidth / imageHeight;
+			int frame = ((int)(Time::GetTime() / sprite.animationTempo)) % animationDuration;
+
+			SDL_FRect sourceRect;
+			sourceRect.h = imageHeight;
+			sourceRect.w = imageWidth / animationDuration;
+			sourceRect.x = (imageWidth / animationDuration) * frame;
+			sourceRect.y = 0;
+
+			SDL_FRect destinationRect;
+			destinationRect.h = imageHeight * sprite.scaleY * mainCamera->scale;
+			destinationRect.w = sourceRect.w * sprite.scaleX * mainCamera->scale;
 			destinationRect.x = (position.positionX - mainCamera->posX) * mainCamera->scale - destinationRect.w / 2 + screenWidth / 2;
 			destinationRect.y = (position.positionY - mainCamera->posY) * mainCamera->scale - destinationRect.h / 2 + screenHeight / 2;
 

@@ -6,15 +6,15 @@
 			"type": "image",
 			"source": "resources/pictures/ttt.bmp"
 		},
-		"aboba":
-		{
-			"type": "image",
-			"source": "resources/pictures/aboba.png"
-		},
 		"frame":
 		{
 			"type": "image",
 			"source": "resources/pictures/Frame.png"
+		},
+		"platAnim":
+		{
+			"type": "image",
+			"source": "resources/pictures/platAnim.png"
 		},
 		"song1":
 		{

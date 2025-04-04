@@ -67,6 +67,13 @@ Application::Application()
 	cSprite.textureName = "frame";
 	registry.emplace<components::Sprite>(entity, cSprite);
 	registry.emplace<components::Position>(entity);
+
+	entt::entity animatedSprite = registry.create();
+	components::AnimatedSprite aSprite = {};
+	aSprite.textureName = "platAnim";
+	aSprite.animationTempo = 0.2f;
+	registry.emplace<components::AnimatedSprite>(animatedSprite, aSprite);
+	registry.emplace<components::Position>(animatedSprite);
 }
 
 Application::~Application()
@@ -81,6 +88,8 @@ void Application::Run()
 
 	while (!close)
 	{
+
+
 		Time::Update();
 
 		SDL_Event event;
