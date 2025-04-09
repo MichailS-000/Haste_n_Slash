@@ -39,6 +39,11 @@
 			"type": "sound",
 			"source": "resources/SFX/beltHandle1.ogg"
 		},
+		"monocraft":
+		{
+			"type": "font",
+			"source": "resources/fonts/Monocraft.otf"
+		},
 		"menuScript":
 		{
 			"type": "script",
