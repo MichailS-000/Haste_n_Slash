@@ -86,6 +86,13 @@ Application::Application()
 
 Application::~Application()
 {
+	delete inputManager;
+	delete resources;
+	delete scriptsManager;
+	delete loader;
+	delete audio;
+	delete renderer;
+
 	SDL_DestroyWindow(window);
 	Logger::Log("Application terminated!");
 }
@@ -96,8 +103,6 @@ void Application::Run()
 
 	while (!close)
 	{
-
-
 		Time::Update();
 
 		SDL_Event event;

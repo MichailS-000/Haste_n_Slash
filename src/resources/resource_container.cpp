@@ -121,8 +121,6 @@ ResourceContainer::ResourceContainer()
 
 ResourceContainer::~ResourceContainer()
 {
-	TTF_Quit();
-
 	Mix_FadeOutMusic(1000);
 	for (auto& [groupName, group] : musicGroups)
 	{
@@ -139,4 +137,6 @@ ResourceContainer::~ResourceContainer()
 	{
 		TTF_CloseFont(font);
 	}
+
+	TTF_Quit();
 }
