@@ -157,6 +157,10 @@ int ResourcesLoader::LoadResources(ResourceContainer* container)
 
 				container->AddSound(sound, resourceName);
 			}
+			else if (resource.value["type"] == "font")
+			{
+				container->AddFont(resource.value["source"].GetString(), resourceName);
+			}
 		}
 	}
 	catch (const std::runtime_error& e)

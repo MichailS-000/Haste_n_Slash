@@ -10,10 +10,12 @@ class Renderer
 private:
 	std::map <std::string, SDL_Texture*> textures;
 	SDL_Renderer* renderer;
-	entt::entity mainCamera;
+	components::Camera* mainCamera;
+	entt::registry* registry;
+	ResourceContainer* container;
 public:
-	void UpdateRenderer(const entt::registry& registry);
-	void LoadTextures(ResourceContainer* container);
-	Renderer(SDL_Window* window, entt::registry* registry);
+	void UpdateRenderer();
+	void LoadTextures();
+	Renderer(SDL_Window* window, entt::registry* registry, ResourceContainer* container);
 	~Renderer();
 };

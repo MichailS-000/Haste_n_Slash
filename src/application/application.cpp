@@ -3,6 +3,9 @@
 #include "../logger/logger.hpp"
 #include "../components/script.hpp"
 #include "program_time.hpp"
+#include "../components/generic.hpp"
+#include "../components/graphic.hpp"
+#include "../components/text.hpp"
 
 Application::Application()
 {
@@ -35,10 +38,10 @@ Application::Application()
 
 	loader->LoadResources(resources);
 
-	renderer = new Renderer(window, &registry);
+	renderer = new Renderer(window, &registry, resources);
 	Logger::Log("Renderer created!");
 
-	renderer->LoadTextures(resources);
+	renderer->LoadTextures();
 	Logger::Log("Images loaded into video memory");
 
 	audio = new AudioManager(resources);
@@ -59,6 +62,26 @@ Application::Application()
 	components::Script menuScript;
 	menuScript.name = "menuScript";
 	registry.emplace<components::Script>(entity, menuScript);
+
+	entt::entity sprite = registry.create();
+	components::Sprite cSprite = {};
+	cSprite.textureName = "frame";
+	registry.emplace<components::Sprite>(entity, cSprite);
+	registry.emplace<components::Position>(entity);
+
+	entt::entity animatedSprite = registry.create();
+	components::AnimatedSprite aSprite = {};
+	aSprite.textureName = "platAnim";
+	aSprite.animationTempo = 0.2f;
+	registry.emplace<components::AnimatedSprite>(animatedSprite, aSprite);
+	registry.emplace<components::Position>(animatedSprite);
+
+	entt::entity text = registry.create();
+	components::Text cText;
+	cText.fontName = "monocraft";
+	cText.text = "Hello FONTS!!";
+	registry.emplace<components::Text>(text, cText);
+	registry.emplace<components::Position>(text);
 }
 
 Application::~Application()
@@ -73,6 +96,8 @@ void Application::Run()
 
 	while (!close)
 	{
+
+
 		Time::Update();
 
 		SDL_Event event;
@@ -89,6 +114,6 @@ void Application::Run()
 		inputManager->Update();
 		scriptsManager->UpdateScripts();
 
-		renderer->UpdateRenderer(registry);
+		renderer->UpdateRenderer();
 	}
 }

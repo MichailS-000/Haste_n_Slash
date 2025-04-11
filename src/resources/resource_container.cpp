@@ -9,6 +9,19 @@ void ResourceContainer::AddImage(Image& img)
 	Logger::Log(std::format("Image \"{}\" loaded", img.name));
 }
 
+void ResourceContainer::AddFont(const std::string& fontFilename, const std::string& fontName)
+{
+	TTF_Font* font = TTF_OpenFont(fontFilename.c_str(), 24);
+	
+	if (font == NULL)
+	{
+		Logger::LogError(4, std::format("Error while loading \"{}\" font {}", fontFilename, SDL_GetError()));
+	}
+
+	fonts.emplace(fontName, font);
+	Logger::Log(std::format("Font \"{}\" loaded", fontName));
+}
+
 void ResourceContainer::AddUncompiledScript(UncompiledScript& script)
 {
 	uncompiledScripts.push(new UncompiledScript(script));
@@ -93,12 +106,23 @@ Mix_Chunk* ResourceContainer::GetSound(const std::string& soundName)
 	}
 }
 
+TTF_Font* ResourceContainer::GetFont(const std::string& fontName)
+{
+	return fonts[fontName];
+}
+
 ResourceContainer::ResourceContainer()
 {
+	if (!TTF_Init())
+	{
+		Logger::LogError(4, "TTF initialization failed!");
+	}
 }
 
 ResourceContainer::~ResourceContainer()
 {
+	TTF_Quit();
+
 	Mix_FadeOutMusic(1000);
 	for (auto& [groupName, group] : musicGroups)
 	{
@@ -110,5 +134,9 @@ ResourceContainer::~ResourceContainer()
 	for (auto& [soundName, sound] : sounds)
 	{
 		Mix_FreeChunk(sound);
+	}
+	for (auto& [fontName, font] : fonts)
+	{
+		TTF_CloseFont(font);
 	}
 }

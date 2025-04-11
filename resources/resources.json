@@ -6,10 +6,15 @@
 			"type": "image",
 			"source": "resources/pictures/ttt.bmp"
 		},
-		"aboba":
+		"frame":
 		{
 			"type": "image",
-			"source": "resources/pictures/aboba.png"
+			"source": "resources/pictures/Frame.png"
+		},
+		"platAnim":
+		{
+			"type": "image",
+			"source": "resources/pictures/platAnim.png"
 		},
 		"song1":
 		{
@@ -33,6 +38,11 @@
 		{
 			"type": "sound",
 			"source": "resources/SFX/beltHandle1.ogg"
+		},
+		"monocraft":
+		{
+			"type": "font",
+			"source": "resources/fonts/Monocraft.otf"
 		},
 		"menuScript":
 		{
