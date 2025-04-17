@@ -2,20 +2,21 @@
 
 #include <entt/entt.hpp>
 
-#include "../resources/resource_container.hpp"
 #include "../components/camera.hpp"
+
+#include <SDL3/SDL.h>
+
+class ResourceAccessor;
 
 class Renderer
 {
 private:
-	std::map <std::string, SDL_Texture*> textures;
 	SDL_Renderer* renderer;
 	components::Camera* mainCamera;
-	entt::registry* registry;
-	ResourceContainer* container;
+	ResourceAccessor* resources;
 public:
-	void UpdateRenderer();
-	void LoadTextures();
-	Renderer(SDL_Window* window, entt::registry* registry, ResourceContainer* container);
+	void UpdateRenderer(entt::registry* registry);
+	SDL_Renderer* GetSDLRenderer();
+	Renderer(SDL_Window* window, entt::registry* registry, ResourceAccessor* resources);
 	~Renderer();
 };

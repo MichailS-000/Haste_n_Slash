@@ -2,6 +2,8 @@
 
 #include "../components/components.hpp"
 #include "../application/program_time.hpp"
+#include "../input_manager/input_manager.hpp"
+#include "../audio_manager/audio_manager.hpp"
 
 #include <LuaBridge/LuaBridge.h>
 #include <lua.hpp>

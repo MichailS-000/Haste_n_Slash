@@ -1,11 +1,21 @@
 #include "application.hpp"
 
-#include "../logger/logger.hpp"
 #include "../components/script.hpp"
-#include "program_time.hpp"
 #include "../components/generic.hpp"
 #include "../components/graphic.hpp"
 #include "../components/text.hpp"
+
+#include "../logger/logger.hpp"
+
+#include "program_time.hpp"
+
+#include <SDL3_mixer/SDL_mixer.h>
+
+#include "../input_manager/input_manager.hpp"
+#include "../resources/resource_container.hpp"
+#include "../resources/resource_loader.hpp"
+#include "../resources/resource_accessor.hpp"
+#include "../audio_manager/audio_manager.hpp"
 
 Application::Application()
 {
@@ -17,16 +27,14 @@ Application::Application()
 	inputManager = new InputManager();
 	Logger::Log("Input manager created!");
 
-	loader = new ResourcesLoader();
-	Logger::Log("Resources loader created!");
-
 	resources = new ResourceContainer();
 	Logger::Log("Resources container created!");
 
-	StartupOptions options = loader->LoadStartupOptions();
-	Logger::Log("Startup options loaded!");
+	ResourceLoader loader(resources);
 
-	window = SDL_CreateWindow("Haste & Slash", options.windowWidth, options.windowHeight, SDL_WINDOW_OPENGL);
+	resourceAccess = new ResourceAccessor(resources);
+
+	window = SDL_CreateWindow("Haste & Slash", 800, 600, SDL_WINDOW_OPENGL);
 	if (window)
 	{
 		Logger::Log("Window created!");
@@ -36,27 +44,25 @@ Application::Application()
 		Logger::LogError(34, "Window creation error");
 	}
 
-	loader->LoadResources(resources);
-
-	renderer = new Renderer(window, &registry, resources);
+	renderer = new Renderer(window, &registry, resourceAccess);
 	Logger::Log("Renderer created!");
 
-	renderer->LoadTextures();
-	Logger::Log("Images loaded into video memory");
-
-	audio = new AudioManager(resources);
+	audio = new AudioManager(resourceAccess);
 	Logger::Log("Audio manager created!");
 
 	env = {}; 
 	env.applicationRegistry = &registry;
 	env.currentUpdatingEntity = entt::null;
 	env.input = inputManager;
-	env.resourcesContainer = resources;
+	env.resources = resourceAccess;
 	env.audio = audio;
 
 	scriptsManager = new ScriptsManager(&env);
-	Logger::Log("Scripts manager created!");
-	scriptsManager->CompileScripts();
+
+	loader.LoadResources(renderer->GetSDLRenderer(), scriptsManager);
+
+	StartupOptions* options = resourceAccess->Get<StartupOptions>("Startup Options");
+	SDL_SetWindowSize(window, options->windowWidth, options->windowHeight);
 
 	entt::entity entity = registry.create();
 	components::Script menuScript;
@@ -89,7 +95,6 @@ Application::~Application()
 	delete inputManager;
 	delete resources;
 	delete scriptsManager;
-	delete loader;
 	delete audio;
 	delete renderer;
 
@@ -119,6 +124,6 @@ void Application::Run()
 		inputManager->Update();
 		scriptsManager->UpdateScripts();
 
-		renderer->UpdateRenderer();
+		renderer->UpdateRenderer(&registry);
 	}
 }

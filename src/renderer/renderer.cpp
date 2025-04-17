@@ -4,10 +4,13 @@
 #include "../components/generic.hpp"
 #include "../components/text.hpp"
 #include "../application/program_time.hpp"
+#include "../resources/resource_accessor.hpp"
+
+#include <SDL3_ttf/SDL_ttf.h>
 
 #include <iostream>
 
-void Renderer::UpdateRenderer()
+void Renderer::UpdateRenderer(entt::registry* registry)
 {
 	SDL_RenderClear(renderer);
 
@@ -20,7 +23,8 @@ void Renderer::UpdateRenderer()
 		for (auto [entity, image] : view.each())
 		{
 			float imageWidth, imageHeight;
-			SDL_GetTextureSize(textures[image.textureName], &imageWidth, &imageHeight);
+			SDL_Texture* texture = resources->Get<SDL_Texture>(image.textureName);
+			SDL_GetTextureSize(texture, &imageWidth, &imageHeight);
 
 			SDL_FRect sourceRect;
 			sourceRect.h = imageHeight;
@@ -34,7 +38,7 @@ void Renderer::UpdateRenderer()
 			destinationRect.x = -(destinationRect.w - screenWidth) / 2;
 			destinationRect.y = 0;
 
-			SDL_RenderTexture(renderer, textures[image.textureName], &sourceRect, &destinationRect);
+			SDL_RenderTexture(renderer, texture, &sourceRect, &destinationRect);
 		}
 	}
 
@@ -44,7 +48,8 @@ void Renderer::UpdateRenderer()
 		for (auto [entity, sprite, position] : view.each())
 		{
 			float imageWidth, imageHeight;
-			SDL_GetTextureSize(textures[sprite.textureName], &imageWidth, &imageHeight);
+			SDL_Texture* texture = resources->Get<SDL_Texture>(sprite.textureName);
+			SDL_GetTextureSize(texture, &imageWidth, &imageHeight);
 
 			SDL_FRect sourceRect;
 			sourceRect.h = imageHeight;
@@ -58,7 +63,7 @@ void Renderer::UpdateRenderer()
 			destinationRect.x = (position.positionX - mainCamera->posX) * mainCamera->scale - destinationRect.w / 2 + screenWidth / 2.f;
 			destinationRect.y = (position.positionY - mainCamera->posY) * mainCamera->scale - destinationRect.h / 2 + screenHeight / 2.f;
 
-			SDL_RenderTexture(renderer, textures[sprite.textureName], &sourceRect, &destinationRect);
+			SDL_RenderTexture(renderer, texture, &sourceRect, &destinationRect);
 		}
 	}
 
@@ -68,7 +73,8 @@ void Renderer::UpdateRenderer()
 		for (auto [entity, sprite, position] : view.each())
 		{
 			float imageWidth, imageHeight;
-			SDL_GetTextureSize(textures[sprite.textureName], &imageWidth, &imageHeight);
+			SDL_Texture* texture = resources->Get<SDL_Texture>(sprite.textureName);
+			SDL_GetTextureSize(texture, &imageWidth, &imageHeight);
 
 			int animationDuration = imageWidth / imageHeight;
 			int frame = ((int)(Time::GetTime() / sprite.animationTempo)) % animationDuration;
@@ -85,7 +91,7 @@ void Renderer::UpdateRenderer()
 			destinationRect.x = (position.positionX - mainCamera->posX) * mainCamera->scale - destinationRect.w / 2 + screenWidth / 2.f;
 			destinationRect.y = (position.positionY - mainCamera->posY) * mainCamera->scale - destinationRect.h / 2 + screenHeight / 2.f;
 
-			SDL_RenderTexture(renderer, textures[sprite.textureName], &sourceRect, &destinationRect);
+			SDL_RenderTexture(renderer, texture, &sourceRect, &destinationRect);
 		}
 	}
 
@@ -99,7 +105,7 @@ void Renderer::UpdateRenderer()
 				SDL_DestroyTexture(text.renderedText);
 			}
 
-			SDL_Surface* renderedTextSurface = TTF_RenderText_Solid(container->GetFont(text.fontName), text.text.c_str(), text.text.length(), text.textColor);
+			SDL_Surface* renderedTextSurface = TTF_RenderText_Solid(resources->Get<TTF_Font>(text.fontName), text.text.c_str(), text.text.length(), text.textColor);
 			text.renderedText = SDL_CreateTextureFromSurface(renderer, renderedTextSurface);
 
 			SDL_SetTextureScaleMode(text.renderedText, SDL_SCALEMODE_PIXELART);
@@ -128,20 +134,12 @@ void Renderer::UpdateRenderer()
 	SDL_RenderPresent(renderer);
 }
 
-void Renderer::LoadTextures()
+SDL_Renderer* Renderer::GetSDLRenderer()
 {
-	Image* image;
-	while ((image = container->GetNextImage()) != nullptr)
-	{
-		textures.emplace(image->name, SDL_CreateTextureFromSurface(renderer, image->surface));
-		SDL_SetTextureScaleMode(textures[image->name], SDL_SCALEMODE_PIXELART);
-
-		SDL_DestroySurface(image->surface);
-		delete image;
-	}
+	return renderer;
 }
 
-Renderer::Renderer(SDL_Window* window, entt::registry* registry, ResourceContainer* container) : registry(registry), container(container)
+Renderer::Renderer(SDL_Window* window, entt::registry* registry, ResourceAccessor* resources) : resources(resources)
 {
 	renderer = SDL_CreateRenderer(window, NULL);
 
@@ -157,10 +155,4 @@ Renderer::Renderer(SDL_Window* window, entt::registry* registry, ResourceContain
 
 Renderer::~Renderer()
 {
-	for (auto& texture : textures)
-	{
-		SDL_DestroyTexture(texture.second);
-	}
-
-	SDL_DestroyRenderer(renderer);
 }

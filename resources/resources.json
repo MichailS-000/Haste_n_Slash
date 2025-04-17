@@ -42,6 +42,7 @@
 		"monocraft":
 		{
 			"type": "font",
+			"size": 24,
 			"source": "resources/fonts/Monocraft.otf"
 		},
 		"menuScript":
@@ -66,6 +67,28 @@
 				"audio"
 			],
 			"source": "resources/scripts/testUpdate.lua"
-		}
+		},
+		"Startup Options":
+		{
+			"window width": 800,
+			"window height": 600,
+			"fullscreen": false
+		},
+		"Music Groups":
+		[
+			{
+				"background":
+				[
+					"song1",
+					"song2",
+					"song3"
+				]
+			},
+			{
+				"battle":
+				[
+				]
+			}
+		]
 	}
 }
