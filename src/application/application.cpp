@@ -64,6 +64,7 @@ Application::Application()
 
 	StartupOptions* options = resourceAccess->Get<StartupOptions>("Startup Options");
 	SDL_SetWindowSize(window, options->windowWidth, options->windowHeight);
+	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 	entt::entity entity = registry.create();
 	components::Script menuScript;
@@ -101,6 +102,10 @@ Application::~Application()
 
 	SDL_DestroyWindow(window);
 	Logger::Log("Application terminated!");
+
+	Mix_CloseAudio();
+	TTF_Quit();
+	SDL_Quit();
 }
 
 void Application::Run()

@@ -20,7 +20,6 @@ AudioManager::AudioManager(ResourceAccessor* resources) : resources(resources)
 
 AudioManager::~AudioManager()
 {
-	Mix_CloseAudio();
 }
 
 void AudioManager::PlaySoundOneShot(const std::string& soundName)
