@@ -20,6 +20,7 @@
 Application::Application()
 {
 	SDL_Init(SDL_INIT_AUDIO);
+	TTF_Init();
 	Mix_OpenAudio(0, NULL);
 
 	Logger::Log("Application started!");

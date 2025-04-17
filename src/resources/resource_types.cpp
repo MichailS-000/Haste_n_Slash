@@ -79,7 +79,14 @@ FontResource::FontResource(const rapidjson::Value& jsonObj, const std::string& n
 
 TTF_Font* FontResource::Load()
 {
-	return TTF_OpenFont(source.c_str(), size);
+	TTF_Font* font = TTF_OpenFont(source.c_str(), size);
+
+	if (font == nullptr)
+	{
+		Logger::LogError(3, std::format("Error occured while loading font from source \"{}\"\nError:{}", source, SDL_GetError()));
+	}
+
+	return font;
 }
 
 ScriptResource::ScriptResource(const rapidjson::Value& jsonObj, const std::string& name) : IResource(jsonObj, name)
