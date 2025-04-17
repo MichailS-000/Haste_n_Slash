@@ -70,8 +70,8 @@
 		},
 		"Startup Options":
 		{
-			"window width": 800,
-			"window height": 600,
+			"window width": 1280,
+			"window height": 720,
 			"fullscreen": false
 		},
 		"Music Groups":

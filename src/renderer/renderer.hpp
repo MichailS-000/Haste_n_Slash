@@ -12,7 +12,7 @@ class Renderer
 {
 private:
 	SDL_Renderer* renderer;
-	components::Camera* mainCamera;
+	entt::entity mainCamera;
 	ResourceAccessor* resources;
 public:
 	void UpdateRenderer(entt::registry* registry);
