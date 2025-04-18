@@ -75,21 +75,21 @@ Application::Application()
 	components::Sprite cSprite = {};
 	cSprite.textureName = "frame";
 	registry.emplace<components::Sprite>(entity, cSprite);
-	registry.emplace<components::Position>(entity);
+	registry.emplace<components::Transform>(entity);
 
 	entt::entity animatedSprite = registry.create();
 	components::AnimatedSprite aSprite = {};
 	aSprite.textureName = "platAnim";
 	aSprite.animationTempo = 0.2f;
 	registry.emplace<components::AnimatedSprite>(animatedSprite, aSprite);
-	registry.emplace<components::Position>(animatedSprite);
+	registry.emplace<components::Transform>(animatedSprite);
 
 	entt::entity text = registry.create();
 	components::Text cText;
 	cText.fontName = "monocraft";
 	cText.text = "Hello FONTS!!";
 	registry.emplace<components::Text>(text, cText);
-	registry.emplace<components::Position>(text);
+	registry.emplace<components::Transform>(text);
 }
 
 Application::~Application()

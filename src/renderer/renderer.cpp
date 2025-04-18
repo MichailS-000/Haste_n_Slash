@@ -17,7 +17,7 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 	int screenWidth, screenHeight;
 	SDL_GetWindowSize(SDL_GetRenderWindow(renderer), &screenWidth, &screenHeight);
 
-	auto [cameraPosition, camera] = registry->get<components::Position, components::Camera>(mainCamera);
+	auto [cameraPosition, camera] = registry->get<components::Transform, components::Camera>(mainCamera);
 
 	{
 		auto view = registry->view<components::Background>();
@@ -45,9 +45,9 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 	}
 
 	{
-		auto view = registry->view<components::Sprite, components::Position>();
+		auto view = registry->view<components::Sprite, components::Transform>();
 
-		for (auto [entity, sprite, position] : view.each())
+		for (auto [entity, sprite, transform] : view.each())
 		{
 			float imageWidth, imageHeight;
 			SDL_Texture* texture = resources->Get<SDL_Texture>(sprite.textureName);
@@ -60,19 +60,19 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 			sourceRect.y = 0;
 
 			SDL_FRect destinationRect;
-			destinationRect.h = imageHeight * sprite.scaleY * camera.scale;
-			destinationRect.w = imageWidth * sprite.scaleX * camera.scale;
-			destinationRect.x = (position.positionX - cameraPosition.positionX) * camera.scale - destinationRect.w / 2 + screenWidth / 2.f;
-			destinationRect.y = (position.positionY - cameraPosition.positionY) * camera.scale - destinationRect.h / 2 + screenHeight / 2.f;
+			destinationRect.h = imageHeight * transform.scaleX * camera.scale;
+			destinationRect.w = imageWidth * transform.scaleY * camera.scale;
+			destinationRect.x = (transform.positionX - cameraPosition.positionX) * camera.scale - destinationRect.w / 2 + screenWidth / 2.f;
+			destinationRect.y = (transform.positionY - cameraPosition.positionY) * camera.scale - destinationRect.h / 2 + screenHeight / 2.f;
 
 			SDL_RenderTexture(renderer, texture, &sourceRect, &destinationRect);
 		}
 	}
 
 	{
-		auto view = registry->view<components::AnimatedSprite, components::Position>();
+		auto view = registry->view<components::AnimatedSprite, components::Transform>();
 
-		for (auto [entity, sprite, position] : view.each())
+		for (auto [entity, sprite, transform] : view.each())
 		{
 			float imageWidth, imageHeight;
 			SDL_Texture* texture = resources->Get<SDL_Texture>(sprite.textureName);
@@ -88,19 +88,19 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 			sourceRect.y = 0;
 
 			SDL_FRect destinationRect;
-			destinationRect.h = imageHeight * sprite.scaleY * camera.scale;
-			destinationRect.w = sourceRect.w * sprite.scaleX * camera.scale;
-			destinationRect.x = (position.positionX - cameraPosition.positionX) * camera.scale - destinationRect.w / 2 + screenWidth / 2.f;
-			destinationRect.y = (position.positionY - cameraPosition.positionY) * camera.scale - destinationRect.h / 2 + screenHeight / 2.f;
+			destinationRect.h = imageHeight * transform.scaleX * camera.scale;
+			destinationRect.w = sourceRect.w * transform.scaleY * camera.scale;
+			destinationRect.x = (transform.positionX - cameraPosition.positionX) * camera.scale - destinationRect.w / 2 + screenWidth / 2.f;
+			destinationRect.y = (transform.positionY - cameraPosition.positionY) * camera.scale - destinationRect.h / 2 + screenHeight / 2.f;
 
 			SDL_RenderTexture(renderer, texture, &sourceRect, &destinationRect);
 		}
 	}
 
 	{
-		auto view = registry->view<components::Position, components::Text>();
+		auto view = registry->view<components::Transform, components::Text>();
 
-		for (auto [enitity, position, text] : view.each())
+		for (auto [enitity, transform, text] : view.each())
 		{
 			if (text.renderedText != nullptr)
 			{
@@ -126,8 +126,8 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 			SDL_FRect destinationRect;
 			destinationRect.h = fontAspect * text.textScale * imageHeight;
 			destinationRect.w = fontAspect * text.textScale * imageWidth;
-			destinationRect.x = (position.positionX - cameraPosition.positionX) * camera.scale - destinationRect.w / 2 + screenWidth / 2.f;
-			destinationRect.y = (position.positionY - cameraPosition.positionY) * camera.scale - destinationRect.h / 2 + screenHeight / 2.f;
+			destinationRect.x = (transform.positionX - cameraPosition.positionX) * camera.scale - destinationRect.w / 2 + screenWidth / 2.f;
+			destinationRect.y = (transform.positionY - cameraPosition.positionY) * camera.scale - destinationRect.h / 2 + screenHeight / 2.f;
 
 			SDL_RenderTexture(renderer, text.renderedText, &sourceRect, &destinationRect);
 		}
@@ -147,7 +147,7 @@ Renderer::Renderer(SDL_Window* window, entt::registry* registry, ResourceAccesso
 
 	auto entity = registry->create();
 	registry->emplace<components::Camera>(entity);
-	registry->emplace<components::Position>(entity);
+	registry->emplace<components::Transform>(entity);
 	mainCamera = entity;
 
 	if (renderer == NULL)
