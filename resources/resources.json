@@ -68,6 +68,17 @@
 			],
 			"source": "resources/scripts/testUpdate.lua"
 		},
+		"movingScript":
+		{
+			"type": "script",
+			"permissions":
+			[
+				"update",
+				"entity",
+				"input"
+			],
+			"source": "resources/scripts/moving.lua"
+		},
 		"Startup Options":
 		{
 			"window width": 1280,

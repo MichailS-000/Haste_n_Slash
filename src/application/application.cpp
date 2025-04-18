@@ -73,9 +73,12 @@ Application::Application()
 
 	entt::entity sprite = registry.create();
 	components::Sprite cSprite = {};
+	components::Script moveScript = {};
+	moveScript.name = "movingScript";
 	cSprite.textureName = "frame";
-	registry.emplace<components::Sprite>(entity, cSprite);
-	registry.emplace<components::Transform>(entity);
+	registry.emplace<components::Sprite>(sprite, cSprite);
+	registry.emplace<components::Transform>(sprite);
+	registry.emplace<components::Script>(sprite, moveScript);
 
 	entt::entity animatedSprite = registry.create();
 	components::AnimatedSprite aSprite = {};

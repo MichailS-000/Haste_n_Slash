@@ -4,6 +4,6 @@ namespace components
 {
 	struct Camera
 	{
-		float scale = 10.f;
+		float scale = 100.f;
 	};
 }

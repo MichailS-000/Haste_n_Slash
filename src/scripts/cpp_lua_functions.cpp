@@ -45,6 +45,18 @@ void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 			{
 				env->applicationRegistry->destroy((entt::entity)entity);
 			})
+		.addFunction("movePosition", [env = env](int entity, float deltaX, float deltaY) 
+			{
+				components::Transform& transform = env->applicationRegistry->get<components::Transform>((entt::entity)entity);
+				transform.positionX += deltaX;
+				transform.positionY += deltaY;
+			})
+		.addFunction("setPosition", [env = env](int entity, float x, float y) 
+			{
+				components::Transform& transform = env->applicationRegistry->get<components::Transform>((entt::entity)entity);
+				transform.positionX = x;
+				transform.positionY = y;
+			})
 		.endNamespace();
 }
 
