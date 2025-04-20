@@ -1,20 +1,20 @@
 #pragma once
 #include <SDL3_mixer/SDL_mixer.h>
-#include "../resources/resource_container.hpp"
+#include <string>
 
-#define BG_MUSIC_CHANEL 0
+class ResourceAccessor;
 
 class AudioManager
 {
 public:
-	AudioManager(ResourceContainer* container);
+	AudioManager(ResourceAccessor* resources);
 	~AudioManager();
 	void PlaySoundOneShot(const std::string& soundName);
 	void StartPlayMusicGroup(const std::string& group);
 	void StopPlayingMusic();
 	void NextTrack();
 private:
-	ResourceContainer* container;
-	Mix_Music* currentMusic;
+	ResourceAccessor* resources;
+	Mix_Music* currentMusic = nullptr;
 	std::string currentMusicGroup;
 };

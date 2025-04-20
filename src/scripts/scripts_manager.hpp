@@ -5,14 +5,13 @@
 class ScriptsManager
 {
 private:
-	std::map<std::string, CompiledScript> scripts;
 	ScriptsExecutionEnviroment* scriptsEnv;
 	SCRIPT_BINARY_PERMISSIONS_TYPE ParsePermissions(std::vector<std::string>& permissions);
-	void LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PERMISSIONS_TYPE permisssions);
+	void LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PERMISSIONS_TYPE permissions);
 public:
 	ScriptsManager(ScriptsExecutionEnviroment* env);
 	~ScriptsManager();
 	void UpdateScripts();
 	bool CallFunction(const char* functionName, lua_State* state);
-	void CompileScripts();
+	CompiledScript* CompileScript(const std::string& source, std::vector<std::string>& permissions);
 };

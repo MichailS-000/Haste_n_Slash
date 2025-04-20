@@ -2,6 +2,8 @@
 
 #include "../components/components.hpp"
 #include "../application/program_time.hpp"
+#include "../input_manager/input_manager.hpp"
+#include "../audio_manager/audio_manager.hpp"
 
 #include <LuaBridge/LuaBridge.h>
 #include <lua.hpp>
@@ -42,6 +44,18 @@ void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 		.addFunction("destroyEntity", [env = env](int entity) 
 			{
 				env->applicationRegistry->destroy((entt::entity)entity);
+			})
+		.addFunction("movePosition", [env = env](int entity, float deltaX, float deltaY) 
+			{
+				components::Transform& transform = env->applicationRegistry->get<components::Transform>((entt::entity)entity);
+				transform.positionX += deltaX;
+				transform.positionY += deltaY;
+			})
+		.addFunction("setPosition", [env = env](int entity, float x, float y) 
+			{
+				components::Transform& transform = env->applicationRegistry->get<components::Transform>((entt::entity)entity);
+				transform.positionX = x;
+				transform.positionY = y;
 			})
 		.endNamespace();
 }

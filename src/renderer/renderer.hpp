@@ -2,18 +2,27 @@
 
 #include <entt/entt.hpp>
 
-#include "../resources/resource_container.hpp"
-#include "../components/camera.hpp"
+#include "../components/components.hpp"
+
+#include <SDL3/SDL.h>
+
+class ResourceAccessor;
 
 class Renderer
 {
 private:
-	std::map <std::string, SDL_Texture*> textures;
 	SDL_Renderer* renderer;
 	entt::entity mainCamera;
+	ResourceAccessor* resources;
+	int screenWidth, screenHeight;
+	SDL_FRect TransformToScreenRect(
+		const components::Transform& transform, 
+		const components::Transform& cameraTransform, 
+		const components::Camera& camera, 
+		float imageWidth, float imageHeight);
 public:
-	void UpdateRenderer(const entt::registry& registry);
-	void LoadTextures(ResourceContainer* container);
-	Renderer(SDL_Window* window, entt::registry* registry);
+	void UpdateRenderer(entt::registry* registry);
+	SDL_Renderer* GetSDLRenderer();
+	Renderer(SDL_Window* window, entt::registry* registry, ResourceAccessor* resources);
 	~Renderer();
 };
