@@ -1,15 +1,26 @@
 #include "application.hpp"
 
-#include "../logger/logger.hpp"
 #include "../components/script.hpp"
-#include "program_time.hpp"
 #include "../components/generic.hpp"
 #include "../components/graphic.hpp"
 #include "../components/text.hpp"
 
+#include "../logger/logger.hpp"
+
+#include "program_time.hpp"
+
+#include <SDL3_mixer/SDL_mixer.h>
+
+#include "../input_manager/input_manager.hpp"
+#include "../resources/resource_container.hpp"
+#include "../resources/resource_loader.hpp"
+#include "../resources/resource_accessor.hpp"
+#include "../audio_manager/audio_manager.hpp"
+
 Application::Application()
 {
 	SDL_Init(SDL_INIT_AUDIO);
+	TTF_Init();
 	Mix_OpenAudio(0, NULL);
 
 	Logger::Log("Application started!");
@@ -17,16 +28,14 @@ Application::Application()
 	inputManager = new InputManager();
 	Logger::Log("Input manager created!");
 
-	loader = new ResourcesLoader();
-	Logger::Log("Resources loader created!");
-
 	resources = new ResourceContainer();
 	Logger::Log("Resources container created!");
 
-	StartupOptions options = loader->LoadStartupOptions();
-	Logger::Log("Startup options loaded!");
+	ResourceLoader loader(resources);
 
-	window = SDL_CreateWindow("Haste & Slash", options.windowWidth, options.windowHeight, SDL_WINDOW_OPENGL);
+	resourceAccess = new ResourceAccessor(resources);
+
+	window = SDL_CreateWindow("Haste & Slash", 800, 600, SDL_WINDOW_OPENGL);
 	if (window)
 	{
 		Logger::Log("Window created!");
@@ -36,27 +45,26 @@ Application::Application()
 		Logger::LogError(34, "Window creation error");
 	}
 
-	loader->LoadResources(resources);
-
-	renderer = new Renderer(window, &registry, resources);
+	renderer = new Renderer(window, &registry, resourceAccess);
 	Logger::Log("Renderer created!");
 
-	renderer->LoadTextures();
-	Logger::Log("Images loaded into video memory");
-
-	audio = new AudioManager(resources);
+	audio = new AudioManager(resourceAccess);
 	Logger::Log("Audio manager created!");
 
 	env = {}; 
 	env.applicationRegistry = &registry;
 	env.currentUpdatingEntity = entt::null;
 	env.input = inputManager;
-	env.resourcesContainer = resources;
+	env.resources = resourceAccess;
 	env.audio = audio;
 
 	scriptsManager = new ScriptsManager(&env);
-	Logger::Log("Scripts manager created!");
-	scriptsManager->CompileScripts();
+
+	loader.LoadResources(renderer->GetSDLRenderer(), scriptsManager);
+
+	StartupOptions* options = resourceAccess->Get<StartupOptions>("Startup Options");
+	SDL_SetWindowSize(window, options->windowWidth, options->windowHeight);
+	SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 	entt::entity entity = registry.create();
 	components::Script menuScript;
@@ -65,29 +73,42 @@ Application::Application()
 
 	entt::entity sprite = registry.create();
 	components::Sprite cSprite = {};
+	components::Script moveScript = {};
+	moveScript.name = "movingScript";
 	cSprite.textureName = "frame";
-	registry.emplace<components::Sprite>(entity, cSprite);
-	registry.emplace<components::Position>(entity);
+	registry.emplace<components::Sprite>(sprite, cSprite);
+	registry.emplace<components::Transform>(sprite);
+	registry.emplace<components::Script>(sprite, moveScript);
 
 	entt::entity animatedSprite = registry.create();
 	components::AnimatedSprite aSprite = {};
 	aSprite.textureName = "platAnim";
 	aSprite.animationTempo = 0.2f;
 	registry.emplace<components::AnimatedSprite>(animatedSprite, aSprite);
-	registry.emplace<components::Position>(animatedSprite);
+	registry.emplace<components::Transform>(animatedSprite);
 
 	entt::entity text = registry.create();
 	components::Text cText;
 	cText.fontName = "monocraft";
 	cText.text = "Hello FONTS!!";
 	registry.emplace<components::Text>(text, cText);
-	registry.emplace<components::Position>(text);
+	registry.emplace<components::Transform>(text);
 }
 
 Application::~Application()
 {
+	delete inputManager;
+	delete resources;
+	delete scriptsManager;
+	delete audio;
+	delete renderer;
+
 	SDL_DestroyWindow(window);
 	Logger::Log("Application terminated!");
+
+	Mix_CloseAudio();
+	TTF_Quit();
+	SDL_Quit();
 }
 
 void Application::Run()
@@ -96,8 +117,6 @@ void Application::Run()
 
 	while (!close)
 	{
-
-
 		Time::Update();
 
 		SDL_Event event;
@@ -114,6 +133,6 @@ void Application::Run()
 		inputManager->Update();
 		scriptsManager->UpdateScripts();
 
-		renderer->UpdateRenderer();
+		renderer->UpdateRenderer(&registry);
 	}
 }

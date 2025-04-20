@@ -3,6 +3,7 @@
 #include "../components/script.hpp"
 #include "../logger/logger.hpp"
 #include "cpp_lua_functions.hpp"
+#include "../resources/resource_accessor.hpp"
 
 #include <LuaBridge/LuaBridge.h>
 #include <unordered_map>
@@ -37,24 +38,24 @@ SCRIPT_BINARY_PERMISSIONS_TYPE ScriptsManager::ParsePermissions(std::vector<std:
     return permissionsBinary;
 }
 
-void ScriptsManager::LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PERMISSIONS_TYPE permisssions)
+void ScriptsManager::LinkScriptsDependencies(lua_State* state, SCRIPT_BINARY_PERMISSIONS_TYPE permissions)
 {
 	luaL_openlibs(state);
 	LinkGenericLib(state, scriptsEnv);
 
-	if (permisssions & ScriptPermissions::Entity)
+	if (permissions & ScriptPermissions::Entity)
 	{
 		LinkEntityLib(state, scriptsEnv);
 	}
-	if (permisssions & ScriptPermissions::Graphics)
+	if (permissions & ScriptPermissions::Graphics)
 	{
 		LinkGraphicsLib(state, scriptsEnv);
 	}
-	if (permisssions & ScriptPermissions::Input)
+	if (permissions & ScriptPermissions::Input)
 	{
 		LinkInputLib(state, scriptsEnv);
 	}
-	if (permisssions & ScriptPermissions::Audio)
+	if (permissions & ScriptPermissions::Audio)
 	{
 		LinkAudioLib(state, scriptsEnv);
 	}
@@ -66,10 +67,6 @@ ScriptsManager::ScriptsManager(ScriptsExecutionEnviroment* env) : scriptsEnv(env
 
 ScriptsManager::~ScriptsManager()
 {
-	for (auto& [_, script] : scripts)
-	{
-		lua_close(script.state);
-	}
 }
 
 void ScriptsManager::UpdateScripts()
@@ -81,33 +78,33 @@ void ScriptsManager::UpdateScripts()
 		scriptsEnv->currentUpdatingEntity = entity;
 
 		components::Script& scriptRef = view.get<components::Script>(entity);
-		CompiledScript& script = scripts[scriptRef.name];
+		CompiledScript* script = scriptsEnv->resources->Get<CompiledScript>(scriptRef.name);
 
-		if (script.name == "null")
+		if (script == nullptr)
 		{
 			Logger::LogError(3, std::format("Script \"{}\" does not exist or not presented in resources.json", scriptRef.name));
 			scriptsEnv->applicationRegistry->erase<components::Script>(entity);
 			continue;
 		}
 		
-		if ((script.permissions & ScriptPermissions::StartFunction) && scriptRef.initState == 0)
+		if ((script->permissions & ScriptPermissions::StartFunction) && scriptRef.initState == 0)
 		{
-			if (CallFunction("Start", script.state))
+			if (CallFunction("Start", script->state))
 			{
 				scriptRef.initState = 1;
 			}
 			else
 			{
-				Logger::Log(std::format("Error trace when Start function called from \"{}\" entityID: {}", script.name, (int)entity));
+				Logger::Log(std::format("Error trace when Start function called from \"{}\" entityID: {}", script->name, (int)entity));
 				scriptsEnv->applicationRegistry->erase<components::Script>(entity);
 			}
 		}
 		
-		if (script.permissions & ScriptPermissions::UpdateFunction)
+		if (script->permissions & ScriptPermissions::UpdateFunction)
 		{
-			if (!CallFunction("Update", script.state))
+			if (!CallFunction("Update", script->state))
 			{
-				Logger::Log(std::format("Error trace when Update function called from \"{}\" entityID: {}", script.name, (int)entity));
+				Logger::Log(std::format("Error trace when Update function called from \"{}\" entityID: {}", script->name, (int)entity));
 				scriptsEnv->applicationRegistry->erase<components::Script>(entity);
 			}
 		}
@@ -141,35 +138,27 @@ bool ScriptsManager::CallFunction(const char* functionName, lua_State* state)
 	return true;
 }
 
-void ScriptsManager::CompileScripts()
+CompiledScript* ScriptsManager::CompileScript(const std::string& source, std::vector<std::string>& permissions)
 {
-	UncompiledScript* uncompiledScript;
+	CompiledScript* script = new CompiledScript();
+	script->permissions = ParsePermissions(permissions);
+	script->state = luaL_newstate();
+	LinkScriptsDependencies(script->state, script->permissions);
 
-	while ((uncompiledScript = scriptsEnv->resourcesContainer->GetNextUncompiledScript()) != nullptr)
+	if (luaL_dofile(script->state, source.c_str()) != 0)
 	{
-		CompiledScript script;
-		script.name = uncompiledScript->name;
-		script.permissions = ParsePermissions(uncompiledScript->permissions);
-		script.state = luaL_newstate();
-		LinkScriptsDependencies(script.state, script.permissions);
-
-		if (luaL_dofile(script.state, uncompiledScript->sourcePath.c_str()) != 0)
+		if (lua_isstring(script->state, lua_gettop(script->state)))
 		{
-			if (lua_isstring(script.state, lua_gettop(script.state)))
-			{
-				std::string error = lua_tostring(script.state, lua_gettop(script.state));
-				lua_pop(script.state, 1);
-				Logger::LogError(3, std::format("Error while lua dofile: {}", error));
-				continue;
-			}
-			else
-			{
-				Logger::LogError(3, std::format("Error while lua dofile: unknown error"));
-			}
+			std::string error = lua_tostring(script->state, lua_gettop(script->state));
+			lua_pop(script->state, 1);
+			Logger::LogError(3, std::format("Error while lua dofile: {}", error));
 		}
-
-		scripts.emplace(script.name, script);
-
-		delete uncompiledScript;
+		else
+		{
+			Logger::LogError(3, std::format("Error while lua dofile: unknown error"));
+		}
+		return nullptr;
 	}
+
+	return script;
 }

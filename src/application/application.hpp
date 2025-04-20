@@ -1,10 +1,12 @@
 #pragma once
 
+#include <entt/entt.hpp>
+#include "scripts_execution_enviroment.hpp"
 #include "../renderer/renderer.hpp"
-#include "../resources/resources_loader.hpp"
-#include "../scripts/scripts_manager.hpp"
-#include "../input_manager/input_manager.hpp"
-#include "../audio_manager/audio_manager.hpp"
+
+class AudioManager;
+class ScriptsManager;
+class ResourceContainer;
 
 class Application
 {
@@ -14,8 +16,8 @@ private:
 	InputManager* inputManager;
 	ScriptsManager* scriptsManager;
 	ResourceContainer* resources;
+	ResourceAccessor* resourceAccess;
 	Renderer* renderer;
-	ResourcesLoader* loader;
 	entt::registry registry;
 	SDL_Window* window;
 public:
