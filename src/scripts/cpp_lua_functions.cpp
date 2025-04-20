@@ -9,6 +9,9 @@
 #include <LuaBridge/LuaBridge.h>
 #include <lua.hpp>
 
+#include <unordered_map>
+#include <format>
+
 template <typename T>
 bool HasComponent(const entt::registry& registry, const entt::entity& entity)
 {
@@ -42,7 +45,7 @@ void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
 	luabridge::getGlobalNamespace(state)
-		.beginNamespace("entity")
+	.beginNamespace("entity")
 		.addFunction("getCurrentEntity", [env = env] 
 			{
 				return (int)env->currentUpdatingEntity;
@@ -74,69 +77,35 @@ void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 			{
 				env->applicationRegistry->destroy((entt::entity)entity);
 			})
-		.addFunction("movePosition", [env = env](int entity, float deltaX, float deltaY) 
+		.beginClass<components::Transform>("Transform")
+			.addProperty("positionX", &components::Transform::positionX, &components::Transform::positionX)
+			.addProperty("positionY", &components::Transform::positionY, &components::Transform::positionY)
+			.addProperty("scaleX", &components::Transform::scaleX, &components::Transform::scaleX)
+			.addProperty("scaleY", &components::Transform::scaleY, &components::Transform::scaleY)
+		.endClass()
+		.addFunction("getComponent", [env = env, state = state](int entity, std::string componentName) -> luabridge::LuaRef
 			{
 				if (!ValidateEntity(*env->applicationRegistry, (entt::entity)entity))
 				{
 					throw std::runtime_error("Trying to handle invalid entity");
 				}
 
-				if (!HasComponent<components::Transform>(*env->applicationRegistry, (entt::entity)entity))
+				if (componentName == "Transform")
 				{
-					throw std::runtime_error("Entity does not contains Transform component");
+					if (!HasComponent<components::Transform>(*env->applicationRegistry, (entt::entity)entity))
+					{
+						throw std::runtime_error(std::format("Entity id:{} does not contains Transform", entity));
+					}
+
+					auto& ptr = env->applicationRegistry->get<components::Transform>((entt::entity)entity);
+
+					return luabridge::LuaRef(state, &ptr);
 				}
 
-				components::Transform& transform = env->applicationRegistry->get<components::Transform>((entt::entity)entity);
-				transform.positionX += deltaX;
-				transform.positionY += deltaY;
+				// TODO: Make getters for all components
+
 			})
-		.addFunction("setPosition", [env = env](int entity, float x, float y) 
-			{
-				if (!ValidateEntity(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Trying to handle invalid entity");
-				}
-
-				if (!HasComponent<components::Transform>(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Entity does not contains Transform component");
-				}
-
-				components::Transform& transform = env->applicationRegistry->get<components::Transform>((entt::entity)entity);
-				transform.positionX = x;
-				transform.positionY = y;
-			})
-		.addFunction("setScale", [env = env](int entity, float x, float y) 
-			{
-				if (!ValidateEntity(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Trying to handle invalid entity");
-				}
-
-				if (!HasComponent<components::Transform>(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Entity does not contains Transform component");
-				}
-
-				components::Transform& transform = env->applicationRegistry->get<components::Transform>((entt::entity)entity);
-				transform.scaleX = x;
-				transform.scaleY = y;
-			})
-		.addFunction("addTransform", [env = env](int entity)
-			{
-				if (!ValidateEntity(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Trying to handle invalid entity");
-				}
-
-				if (HasComponent<components::Transform>(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Entity already contains Transform component");
-				}
-				
-				env->applicationRegistry->emplace<components::Transform>((entt::entity)entity);
-			})
-		.endNamespace();
+	.endNamespace();
 }
 
 void LinkInputLib(lua_State* state, ScriptsExecutionEnviroment* env)
