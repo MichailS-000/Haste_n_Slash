@@ -56,18 +56,6 @@
 			],
 			"source": "resources/scripts/menu.lua"
 		},
-		"testUpdate":
-		{
-			"type": "script",
-			"permissions":
-			[
-				"update",
-				"input",
-				"entity",
-				"audio"
-			],
-			"source": "resources/scripts/testUpdate.lua"
-		},
 		"movingScript":
 		{
 			"type": "script",

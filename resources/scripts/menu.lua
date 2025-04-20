@@ -1,4 +1,5 @@
 
 function Start()
-	graphics.addBackground("pic1")
+	a = entity.addEntity()
+	graphics.addBackground("pic1", a)
 end

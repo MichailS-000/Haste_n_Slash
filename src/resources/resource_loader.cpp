@@ -102,6 +102,7 @@ void ResourceLoader::LoadResources(SDL_Renderer* renderer, ScriptsManager* scrip
 		{
 			ScriptResource script(obj.value, objectName);
 			CompiledScript* compiledScript = script.Load(scriptsManager);
+			compiledScript->name = objectName;
 
 			container->AddResource<CompiledScript>(objectName, compiledScript);
 		}

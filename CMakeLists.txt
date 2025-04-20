@@ -72,7 +72,7 @@ file(GLOB_RECURSE RESOURCE_FILES ${PROJECT_SOURCE_DIR}/resources/*)
 
 # Создаем кастомную цель для копирования ресурсов
 add_custom_target(copy_resources ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    COMMAND robocopy /MIR
     ${PROJECT_SOURCE_DIR}/resources
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources
     COMMENT "Copying resources..."

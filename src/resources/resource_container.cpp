@@ -23,6 +23,7 @@ ResourceContainer::~ResourceContainer()
 	}
 	for (auto& [scriptName, script] : scripts)
 	{
+		lua_close(script->state);
 		delete script;
 	}
 
