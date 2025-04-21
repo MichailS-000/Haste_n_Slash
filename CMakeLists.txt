@@ -72,10 +72,9 @@ file(GLOB_RECURSE RESOURCE_FILES ${PROJECT_SOURCE_DIR}/resources/*)
 
 # Создаем кастомную цель для копирования ресурсов
 add_custom_target(copy_resources ALL
-    COMMAND robocopy /MIR
-    ${PROJECT_SOURCE_DIR}/resources
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources
+    COMMAND cmd /c "robocopy /MIR ${PROJECT_SOURCE_DIR}/resources ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources & if %ERRORLEVEL% LEQ 1 exit 0"
     COMMENT "Copying resources..."
+    VERBATIM
 )
 
 # Делаем так, чтобы цель LuaExample зависела от копирования ресурсов
