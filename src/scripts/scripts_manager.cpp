@@ -75,9 +75,12 @@ void ScriptsManager::UpdateScripts()
 
 	for (auto entity : view)
 	{
-		scriptsEnv->currentUpdatingEntity = entity;
-
 		components::Script& scriptRef = view.get<components::Script>(entity);
+
+		if (!scriptRef.enabled)
+			continue;
+
+		scriptsEnv->currentUpdatingEntity = entity;
 		CompiledScript* script = scriptsEnv->resources->Get<CompiledScript>(scriptRef.name);
 
 		if (script == nullptr)

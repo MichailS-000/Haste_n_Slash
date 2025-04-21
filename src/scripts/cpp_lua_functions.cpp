@@ -20,6 +20,7 @@ private:
 	static inline std::unordered_map<std::string, std::function<void(EntityHelper*)>> removeMap;
 	static inline std::unordered_map<std::string, std::function<luabridge::LuaRef(EntityHelper*)>> addMap;
 	static inline std::unordered_map<std::string, std::function<luabridge::LuaRef(EntityHelper*)>> getMap;
+	static inline std::unordered_map<std::string, std::function<EntityHelper(entt::registry*, lua_State*)>> getEntityMap;
 
 	entt::entity entity;
 	entt::registry* registry;
@@ -33,11 +34,40 @@ private:
 		removeMap[name] = [](EntityHelper* self) { self->EraseComponent<T>(); };
 		addMap[name] = [](EntityHelper* self) { return self->ApplyComponent<T>(); };
 		getMap[name] = [](EntityHelper* self) { return self->ReturnComponent<T>(); };
+		getEntityMap[name] = [](entt::registry* reg, lua_State* state) { return GetFirstEntityWithComponent<T>(reg, state); };
 
 		Logger::Log(std::format("Component \"{}\" registered", name));
 	}
 
+	template<typename T>
+	static EntityHelper GetFirstEntityWithComponent(entt::registry* reg, lua_State* state)
+	{
+		auto view = reg->view<T>();
+
+		if (view.size() > 0)
+		{
+			return EntityHelper(view.front(), reg, state);
+		}
+		else
+		{
+			throw std::runtime_error(std::format("Registry does not contains entities with component \"{}\"", ComponentTraits<T>::name));
+		}
+	}
+
 public:
+
+	static EntityHelper GetEntityWithComponent(entt::registry* reg, lua_State* state, std::string& componentName)
+	{
+		if (auto it = getEntityMap.find(componentName); it != getEntityMap.end())
+		{
+			return it->second(reg, state);
+		}
+		else
+		{
+			Logger::LogWarning(4, std::format("Component \"{}\" does not exist", componentName));
+			return luabridge::LuaRef(state);
+		}
+	}
 
 	template<typename... Components>
 	static void RegisterAllComponents()
@@ -203,13 +233,7 @@ void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 				})
 			.addFunction("getFirstEntityWithComponent", [env = env, state = state](std::string componentName) 
 				{
-					if (componentName == "Camera")
-					{
-						auto view = env->applicationRegistry->view<components::Camera>();
-						return EntityHelper(view.front(), env->applicationRegistry, state);
-					}
-
-					// TODO: Make for all components
+					return EntityHelper::GetEntityWithComponent(env->applicationRegistry, state, componentName);
 				})
 			.addFunction("setVariable", [env = env, variables = variableTable](std::string varName, luabridge::LuaRef value)
 				{
@@ -250,26 +274,39 @@ void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
 	g_env = env;
 
-	luabridge::getGlobalNamespace(state)
-	.beginNamespace("entity")
-		.beginClass<components::Transform>("Transform")
-			.addProperty("positionX", &components::Transform::positionX, &components::Transform::positionX)
-			.addProperty("positionY", &components::Transform::positionY, &components::Transform::positionY)
-			.addProperty("scaleX", &components::Transform::scaleX, &components::Transform::scaleX)
-			.addProperty("scaleY", &components::Transform::scaleY, &components::Transform::scaleY)
-			.addFunction("movePosition", [](components::Transform& transform, float x, float y) 
-				{
-					transform.positionX += x;
-					transform.positionY += y;
-				})
-		.endClass()
-		.beginClass<components::Camera>("Camera")
-			.addProperty("scale", &components::Camera::scale, &components::Camera::scale)
-		.endClass()
-		.beginClass<components::Sprite>("Sprite")
-			.addProperty("textureName", &components::Sprite::textureName, &components::Sprite::textureName)
-		.endClass()
-	.endNamespace();
+	try
+	{
+		luabridge::getGlobalNamespace(state)
+		.beginNamespace("entity")
+			.beginClass<components::ComponentBase>("ComponentBase")
+				.addProperty("enabled", &components::ComponentBase::enabled, &components::ComponentBase::enabled)
+			.endClass()
+			.deriveClass<components::Transform, components::ComponentBase>("Transform")
+				.addProperty("positionX", &components::Transform::positionX, &components::Transform::positionX)
+				.addProperty("positionY", &components::Transform::positionY, &components::Transform::positionY)
+				.addProperty("scaleX", &components::Transform::scaleX, &components::Transform::scaleX)
+				.addProperty("scaleY", &components::Transform::scaleY, &components::Transform::scaleY)
+				.addFunction("movePosition", [](components::Transform& transform, float x, float y)
+					{
+						transform.positionX += x;
+						transform.positionY += y;
+					})
+			.endClass()
+			.deriveClass<components::Camera, components::ComponentBase>("Camera")
+				.addProperty("scale", &components::Camera::scale, &components::Camera::scale)
+			.endClass()
+			.deriveClass<components::Sprite, components::ComponentBase>("Sprite")
+				.addProperty("textureName", &components::Sprite::textureName, &components::Sprite::textureName)
+			.endClass()
+				.deriveClass<components::Background, components::ComponentBase>("Background")
+			.addProperty("textureName", &components::Background::textureName, &components::Background::textureName)
+			.endClass()
+		.endNamespace();
+	}
+	catch (std::logic_error& e)
+	{
+		Logger::LogError(3, std::format("Lua linking error with: {}", e.what()));
+	}
 }
 
 void LinkInputLib(lua_State* state, ScriptsExecutionEnviroment* env)
@@ -295,38 +332,6 @@ void LinkGraphicsLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
 	luabridge::getGlobalNamespace(state)
 		.beginNamespace("graphics")
-		.addFunction("addBackground", [env = env](std::string textureName, int entity) 
-			{
-				if (!ValidateEntity(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Trying to handle invalid entity");
-				}
-
-				if (HasComponent<components::Background>(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Entity already contains Background component");
-				}
-
-				components::Background bg;
-				bg.textureName = textureName;
-				env->applicationRegistry->emplace<components::Background>((entt::entity)entity, bg);
-			})
-		.addFunction("addSprite", [env = env](std::string textureName, int entity)
-			{
-				if (!ValidateEntity(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Trying to handle invalid entity");
-				}
-
-				if (HasComponent<components::Sprite>(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Entity already contains Sprite component");
-				}
-
-				components::Sprite sprite;
-				sprite.textureName = textureName;
-				env->applicationRegistry->emplace<components::Sprite>((entt::entity)entity, sprite);
-			})
 		.endNamespace();
 }
 

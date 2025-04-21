@@ -3,7 +3,7 @@
 
 namespace components
 {
-	struct Camera
+	struct Camera : ComponentBase
 	{
 		float scale = 100.f;
 	};

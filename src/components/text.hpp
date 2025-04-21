@@ -4,7 +4,7 @@
 
 namespace components
 {
-	struct Text
+	struct Text : ComponentBase
 	{
 		std::string text = "";
 		SDL_Color textColor = {255, 255, 255, 255};

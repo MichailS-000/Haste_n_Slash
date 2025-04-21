@@ -3,7 +3,7 @@
 
 namespace components
 {
-	struct Transform
+	struct Transform : ComponentBase
 	{
 		float positionX = 0;
 		float positionY = 0;
@@ -11,7 +11,7 @@ namespace components
 		float scaleY = 1;
 	};
 
-	struct RectTransform
+	struct RectTransform : ComponentBase
 	{
 		float pivotX = 0.5f;
 		float pivotY = 0.5f;

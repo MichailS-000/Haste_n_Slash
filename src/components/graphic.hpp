@@ -3,17 +3,17 @@
 
 namespace components
 {
-	struct Sprite
+	struct Sprite : ComponentBase
 	{
 		std::string textureName = "null";
 	};
 
-	struct Background
+	struct Background : ComponentBase
 	{
 		std::string textureName = "null";
 	};
 
-	struct AnimatedSprite
+	struct AnimatedSprite : ComponentBase
 	{
 		std::string textureName = "null";
 		float animationTempo = 1;

@@ -36,6 +36,9 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 
 		for (auto [entity, image] : view.each())
 		{
+			if (!image.enabled)
+				continue;
+
 			float imageWidth, imageHeight;
 			SDL_Texture* texture = resources->Get<SDL_Texture>(image.textureName);
 			SDL_GetTextureSize(texture, &imageWidth, &imageHeight);
@@ -61,6 +64,9 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 
 		for (auto [entity, sprite, transform] : view.each())
 		{
+			if (!sprite.enabled)
+				continue;
+
 			float imageWidth, imageHeight;
 			SDL_Texture* texture = resources->Get<SDL_Texture>(sprite.textureName);
 			SDL_GetTextureSize(texture, &imageWidth, &imageHeight);
@@ -82,6 +88,9 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 
 		for (auto [entity, sprite, transform] : view.each())
 		{
+			if (!sprite.enabled)
+				continue;
+
 			float imageWidth, imageHeight;
 			SDL_Texture* texture = resources->Get<SDL_Texture>(sprite.textureName);
 			SDL_GetTextureSize(texture, &imageWidth, &imageHeight);
@@ -117,6 +126,9 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 
 		for (auto [enitity, transform, text] : view.each())
 		{
+			if (!text.enabled)
+				continue;
+
 			if (text.renderedText != nullptr)
 			{
 				SDL_DestroyTexture(text.renderedText);

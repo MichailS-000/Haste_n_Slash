@@ -1,9 +1,12 @@
 #pragma once
 
-struct ComponentBase
+namespace components
 {
-	bool enabled;
-};
+	struct ComponentBase
+	{
+		bool enabled = true;
+	};
+}
 
 template<typename T>
 struct ComponentTraits

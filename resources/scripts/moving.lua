@@ -18,4 +18,9 @@ function Update()
 	if (input.getKeyDown("D")) then
 		transform.scaleX = transform.scaleX - 0.1
 	end
+
+	if (input.getKeyDown("ESCAPE")) then
+		local background = getFirstEntityWithComponent("Background"):getComponent("Background")
+		background.enabled = not background.enabled
+	end
 end

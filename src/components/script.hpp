@@ -3,7 +3,7 @@
 
 namespace components
 {
-	struct Script
+	struct Script : ComponentBase
 	{
 		char initState = 0;
 		std::string name = "null";
