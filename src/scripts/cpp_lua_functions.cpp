@@ -71,6 +71,55 @@ public:
 		}
 	}
 
+	template<typename T>
+	inline void EraseComponent()
+	{
+		if (registry->all_of<T>(entity))
+		{
+			registry->erase<T>(entity);
+		}
+		else
+		{
+			Logger::LogWarning(4, std::format("Entity id: {} does not contains {}", (int)entity, typeid(T).name()));
+		}
+	}
+
+	void RemoveComponent(std::string componentName)
+	{
+		if (componentName == "Transform")
+		{
+			EraseComponent<components::Transform>();
+		}
+		else if (componentName == "Sprite")
+		{
+			EraseComponent<components::Sprite>();
+		}
+		else if (componentName == "Script")
+		{
+			EraseComponent<components::Script>();
+		}
+		else if (componentName == "RectTransform")
+		{
+			EraseComponent<components::RectTransform>();
+		}
+		else if (componentName == "Camera")
+		{
+			EraseComponent<components::Camera>();
+		}
+		else if (componentName == "Background")
+		{
+			EraseComponent<components::Background>();
+		}
+		else if (componentName == "AnimatedSprite")
+		{
+			EraseComponent<components::AnimatedSprite>();
+		}
+		else
+		{
+			Logger::LogWarning(4, std::format("Component \"{}\" does not exists", componentName));
+		}
+	}
+
 	luabridge::LuaRef AddComponent(std::string componentName)
 	{
 		if (componentName == "Transform")
@@ -172,6 +221,7 @@ void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 				.addFunction("getID", &EntityHelper::GetId)
 				.addFunction("getComponent", &EntityHelper::GetComponent)
 				.addFunction("addComponent", &EntityHelper::AddComponent)
+				.addFunction("removeComponent", &EntityHelper::RemoveComponent)
 				.addFunction("destroy", &EntityHelper::Destroy)
 				.addProperty("transform", [](EntityHelper* entity) { return entity->GetTransform(); })
 			.endClass()
