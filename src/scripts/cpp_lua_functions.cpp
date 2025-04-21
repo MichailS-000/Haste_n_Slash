@@ -215,19 +215,6 @@ public:
 	}
 };
 
-static ScriptsExecutionEnviroment* g_env = nullptr;
-
-template <typename T>
-bool HasComponent(const entt::registry& registry, const entt::entity& entity)
-{
-	return (registry.try_get<T>(entity) != nullptr);
-}
-
-bool ValidateEntity(const entt::registry& registry, const entt::entity& entity)
-{
-	return registry.valid(entity);
-}
-
 void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
 	EntityHelper::RegisterAllComponents<
@@ -237,9 +224,8 @@ void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 		components::RectTransform,
 		components::Script,
 		components::Sprite,
-		components::Transform>();
-
-	g_env = env;
+		components::Transform,
+		components::Tag>();
 
 	auto variableTable = luabridge::newTable(state);
 
@@ -279,6 +265,42 @@ void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 				{
 					return variables[std::format("{}{}", varName, (int)env->currentUpdatingEntity)];
 				})
+			.addFunction("getEntityWithTag", [env = env, state = state](std::string tag) 
+				{
+					auto view = env->applicationRegistry->view<components::Tag>();
+
+					if (view.size() > 0)
+					{
+						for (auto [entity, tagComp] : view.each())
+						{
+							if (tagComp.tag == tag)
+							{
+								return EntityHelper(entity, env->applicationRegistry, state);
+							}
+						}
+					}
+				})
+			.addFunction("getAllEntitiesWithTag", [env = env, state = state](std::string tag) 
+				{
+					auto view = env->applicationRegistry->view<components::Tag>();
+
+					if (view.size() > 0)
+					{
+						luabridge::LuaRef table = luabridge::newTable(state);
+
+						int i = 1;
+						for (auto [entity, tagComp] : view.each())
+						{
+							if (tagComp.tag == tag)
+							{
+								table[i] = EntityHelper(entity, env->applicationRegistry, state);
+								i++;
+							}
+						}
+
+						return table;
+					}
+				})
 
 
 			.beginNamespace("time")
@@ -308,12 +330,13 @@ void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 
 void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
-	g_env = env;
-
 	try
 	{
 		luabridge::getGlobalNamespace(state)
 		.beginNamespace("entity")
+			.beginClass<components::Tag>("Tag")
+				.addProperty("tag", &components::Tag::tag, &components::Tag::tag)
+			.endClass()
 			.beginClass<components::ComponentBase>("ComponentBase")
 				.addProperty("enabled", &components::ComponentBase::enabled, &components::ComponentBase::enabled)
 			.endClass()

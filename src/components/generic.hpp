@@ -3,6 +3,11 @@
 
 namespace components
 {
+	struct Tag
+	{
+		std::string tag = "default";
+	};
+
 	struct Transform : ComponentBase
 	{
 		float positionX = 0;
@@ -27,3 +32,6 @@ const std::string ComponentTraits<components::Transform>::name = "Transform";
 
 template <>
 const std::string ComponentTraits<components::RectTransform>::name = "RectTransform";
+
+template <>
+const std::string ComponentTraits<components::Tag>::name = "Tag";
