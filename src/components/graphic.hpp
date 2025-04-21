@@ -17,5 +17,7 @@ namespace components
 	{
 		std::string textureName = "null";
 		float animationTempo = 1;
+		float animationStartTime = 0;
+		bool looped = false;
 	};
 }

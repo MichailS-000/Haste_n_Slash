@@ -15,8 +15,8 @@ SDL_FRect Renderer::TransformToScreenRect(const components::Transform& transform
 	float aspect = imageWidth / imageHeight;
 
 	SDL_FRect destinationRect;
-	destinationRect.h = transform.scaleX * camera.scale;
-	destinationRect.w = aspect * transform.scaleY * camera.scale;
+	destinationRect.h = transform.scaleY * camera.scale;
+	destinationRect.w = aspect * transform.scaleX * camera.scale;
 	destinationRect.x = (transform.positionX - cameraTransform.positionX) * camera.scale - destinationRect.w / 2 + screenWidth / 2.f;
 	destinationRect.y = -(transform.positionY - cameraTransform.positionY) * camera.scale - destinationRect.h / 2 + screenHeight / 2.f;
 
@@ -87,7 +87,18 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 			SDL_GetTextureSize(texture, &imageWidth, &imageHeight);
 
 			int animationDuration = imageWidth / imageHeight;
-			int frame = ((int)(Time::GetTime() / sprite.animationTempo)) % animationDuration;
+			
+			int frame = 0;
+
+			if (sprite.looped)
+			{
+				frame = ((int)((Time::GetTime() + sprite.animationStartTime) / sprite.animationTempo)) % animationDuration;
+			}
+			else
+			{
+				frame = ((int)((Time::GetTime() + sprite.animationStartTime) / sprite.animationTempo));
+				frame = SDL_clamp(frame, 0, animationDuration - 1);
+			}
 
 			SDL_FRect sourceRect;
 			sourceRect.h = imageHeight;

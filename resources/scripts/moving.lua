@@ -5,11 +5,17 @@ end
 
 function Update()
 
+	local transform = getVariable("transform")
+
 	if (input.getKeyDown("W")) then
-		getVariable("transform"):movePosition(0, 1)
+		transform:movePosition(0, 1)
 	end
 
-	if (input.getKeyDown("UP")) then
-		getVariable("cameraTransform"):movePosition(0, 1)
+	if (input.getKeyDown("A")) then
+		transform.scaleX = transform.scaleX + 0.1
+	end
+
+	if (input.getKeyDown("D")) then
+		transform.scaleX = transform.scaleX - 0.1
 	end
 end
