@@ -129,16 +129,22 @@ void Renderer::UpdateRenderer(entt::registry* registry)
 			if (!text.enabled)
 				continue;
 
-			if (text.renderedText != nullptr)
+			if (text.needRendering)
 			{
-				SDL_DestroyTexture(text.renderedText);
+				if (text.renderedText != nullptr)
+				{
+					SDL_DestroyTexture(text.renderedText);
+				}
+
+				SDL_Surface* renderedTextSurface = TTF_RenderText_Solid(resources->Get<TTF_Font>(text.fontName), text.getString().c_str(), text.getString().length(), text.textColor);
+				text.renderedText = SDL_CreateTextureFromSurface(renderer, renderedTextSurface);
+
+				SDL_SetTextureScaleMode(text.renderedText, SDL_SCALEMODE_PIXELART);
+				SDL_DestroySurface(renderedTextSurface);
+
+				text.needRendering = false;
 			}
 
-			SDL_Surface* renderedTextSurface = TTF_RenderText_Solid(resources->Get<TTF_Font>(text.fontName), text.text.c_str(), text.text.length(), text.textColor);
-			text.renderedText = SDL_CreateTextureFromSurface(renderer, renderedTextSurface);
-
-			SDL_SetTextureScaleMode(text.renderedText, SDL_SCALEMODE_PIXELART);
-			SDL_DestroySurface(renderedTextSurface);
 			float imageWidth, imageHeight;
 			SDL_GetTextureSize(text.renderedText, &imageWidth, &imageHeight);
 

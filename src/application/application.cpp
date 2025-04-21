@@ -85,7 +85,7 @@ Application::Application()
 	entt::entity text = registry.create();
 	components::Text cText;
 	cText.fontName = "monocraft";
-	cText.text = "Hello FONTS!!";
+	cText.SetText("Hello fonts!");
 	registry.emplace<components::Text>(text, cText);
 	registry.emplace<components::Transform>(text);
 }

@@ -1,34 +1,28 @@
 function Start()
 	setVariable("transform", getCurrentEntity():getComponent("Transform"))
+	setVariable("speed", 10)
 	setVariable("cameraTransform", getFirstEntityWithComponent("Camera"):getComponent("Transform"))
 end
 
 function Update()
 
 	local transform = getVariable("transform")
+	local speed = getVariable("speed")
 
-	if (input.getKeyDown("W")) then
-		transform:movePosition(0, 1)
+	if (input.getKey("W")) then
+		transform:movePosition(0, time.getDeltaTime() * speed)
 	end
 
-	if (input.getKeyDown("A")) then
-		transform.scaleX = transform.scaleX + 0.1
+	if (input.getKey("A")) then
+		transform:movePosition(-time.getDeltaTime() * speed, 0)
 	end
 
-	if (input.getKeyDown("D")) then
-		transform.scaleX = transform.scaleX - 0.1
+	if (input.getKey("D")) then
+		transform:movePosition(time.getDeltaTime() * speed, 0)
 	end
 
-	if (input.getKeyDown("ESCAPE")) then
-		local background = getFirstEntityWithComponent("Background"):getComponent("Background")
-		background.enabled = not background.enabled
+	if (input.getKey("S")) then
+		transform:movePosition(0, -time.getDeltaTime() * speed)
 	end
 
-	if (input.getKeyDown("1")) then
-		local transformEntities = getAllEntitiesWithComponent("Transform")
-		
-		for i, entity in ipairs(transformEntities) do
-			print(i)
-		end
-	end
 end

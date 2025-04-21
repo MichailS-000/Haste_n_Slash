@@ -312,10 +312,6 @@ void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 				{
 					return Time::GetDeltaTime();
 				})
-			.addFunction("selfDestruct", [env = env]()
-				{
-					env->applicationRegistry->destroy(env->currentUpdatingEntity);
-				})
 			.endNamespace();
 	}
 	catch (std::logic_error& e)
@@ -357,8 +353,8 @@ void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 			.deriveClass<components::Sprite, components::ComponentBase>("Sprite")
 				.addProperty("textureName", &components::Sprite::textureName, &components::Sprite::textureName)
 			.endClass()
-				.deriveClass<components::Background, components::ComponentBase>("Background")
-			.addProperty("textureName", &components::Background::textureName, &components::Background::textureName)
+			.deriveClass<components::Background, components::ComponentBase>("Background")
+				.addProperty("textureName", &components::Background::textureName, &components::Background::textureName)
 			.endClass()
 		.endNamespace();
 	}
