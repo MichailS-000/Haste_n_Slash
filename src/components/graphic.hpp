@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include "component.hpp"
 
 namespace components
 {
@@ -21,3 +21,12 @@ namespace components
 		bool looped = false;
 	};
 }
+
+template <>
+const std::string ComponentTraits<components::Sprite>::name = "Sprite";
+
+template <>
+const std::string ComponentTraits<components::Background>::name = "Background";
+
+template <>
+const std::string ComponentTraits<components::AnimatedSprite>::name = "AnimatedSprite";

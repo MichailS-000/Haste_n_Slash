@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include "component.hpp"
 
 namespace components
 {
@@ -9,3 +9,6 @@ namespace components
 		std::string name = "null";
 	};
 }
+
+template <>
+const std::string ComponentTraits<components::Script>::name = "Sprite";

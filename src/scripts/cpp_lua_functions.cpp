@@ -15,10 +15,40 @@
 class EntityHelper
 {
 private:
+	static inline bool registerFlag = false;
+
+	static inline std::unordered_map<std::string, std::function<void(EntityHelper*)>> removeMap;
+	static inline std::unordered_map<std::string, std::function<luabridge::LuaRef(EntityHelper*)>> addMap;
+	static inline std::unordered_map<std::string, std::function<luabridge::LuaRef(EntityHelper*)>> getMap;
+
 	entt::entity entity;
 	entt::registry* registry;
 	lua_State* state;
+
+	template<typename T>
+	static void RegisterComponent()
+	{
+		std::string name = ComponentTraits<T>::name;
+
+		removeMap[name] = [](EntityHelper* self) { self->EraseComponent<T>(); };
+		addMap[name] = [](EntityHelper* self) { return self->ApplyComponent<T>(); };
+		getMap[name] = [](EntityHelper* self) { return self->ReturnComponent<T>(); };
+
+		Logger::Log(std::format("Component \"{}\" registered", name));
+	}
+
 public:
+
+	template<typename... Components>
+	static void RegisterAllComponents()
+	{
+		if (registerFlag)
+			return;
+
+		(RegisterComponent<Components>(), ...);
+		registerFlag = true;
+	}	
+
 	EntityHelper(entt::entity entity, entt::registry* registry, lua_State* state) : entity(entity), registry(registry), state(state)
 	{
 
@@ -80,116 +110,44 @@ public:
 		}
 		else
 		{
-			Logger::LogWarning(4, std::format("Entity id: {} does not contains {}", (int)entity, typeid(T).name()));
+			Logger::LogWarning(4, std::format("Entity id: {} does not contains {}", (int)entity, ComponentTraits<T>::name));
 		}
 	}
 
 	void RemoveComponent(std::string componentName)
 	{
-		if (componentName == "Transform")
+		if (auto it = removeMap.find(componentName); it != removeMap.end())
 		{
-			EraseComponent<components::Transform>();
-		}
-		else if (componentName == "Sprite")
-		{
-			EraseComponent<components::Sprite>();
-		}
-		else if (componentName == "Script")
-		{
-			EraseComponent<components::Script>();
-		}
-		else if (componentName == "RectTransform")
-		{
-			EraseComponent<components::RectTransform>();
-		}
-		else if (componentName == "Camera")
-		{
-			EraseComponent<components::Camera>();
-		}
-		else if (componentName == "Background")
-		{
-			EraseComponent<components::Background>();
-		}
-		else if (componentName == "AnimatedSprite")
-		{
-			EraseComponent<components::AnimatedSprite>();
+			it->second(this);
 		}
 		else
 		{
-			Logger::LogWarning(4, std::format("Component \"{}\" does not exists", componentName));
+			Logger::LogWarning(4, std::format("Component \"{}\" does not exist", componentName));
 		}
 	}
 
-	luabridge::LuaRef AddComponent(std::string componentName)
+	luabridge::LuaRef AddComponent(const std::string& componentName)
 	{
-		if (componentName == "Transform")
+		if (auto it = addMap.find(componentName); it != addMap.end())
 		{
-			return ApplyComponent<components::Transform>();
-		}
-		else if (componentName == "Sprite")
-		{
-			return ApplyComponent<components::Sprite>();
-		}
-		else if (componentName == "Script")
-		{
-			return ApplyComponent<components::Script>();
-		}
-		else if (componentName == "RectTransform")
-		{
-			return ApplyComponent<components::RectTransform>();
-		}
-		else if (componentName == "Camera")
-		{
-			return ApplyComponent<components::Camera>();
-		}
-		else if (componentName == "Background")
-		{
-			return ApplyComponent<components::Background>();
-		}
-		else if (componentName == "AnimatedSprite")
-		{
-			return ApplyComponent<components::AnimatedSprite>();
+			return it->second(this);
 		}
 		else
 		{
-			Logger::LogWarning(4, std::format("Component \"{}\" does not exists", componentName));
+			Logger::LogWarning(4, std::format("Component \"{}\" does not exist", componentName));
 			return luabridge::LuaRef(state);
 		}
 	}
 
-	luabridge::LuaRef GetComponent(std::string componentName)
+	luabridge::LuaRef GetComponent(const std::string& componentName)
 	{
-		if (componentName == "Transform")
+		if (auto it = getMap.find(componentName); it != getMap.end())
 		{
-			return ReturnComponent<components::Transform>();
-		}
-		else if (componentName == "Sprite")
-		{
-			return ReturnComponent<components::Sprite>();
-		}
-		else if (componentName == "Script")
-		{
-			return ReturnComponent<components::Script>();
-		}
-		else if (componentName == "RectTransform")
-		{
-			return ReturnComponent<components::RectTransform>();
-		}
-		else if (componentName == "Camera")
-		{
-			return ReturnComponent<components::Camera>();
-		}
-		else if (componentName == "Background")
-		{
-			return ReturnComponent<components::Background>();
-		}
-		else if (componentName == "AnimatedSprite")
-		{
-			return ReturnComponent<components::AnimatedSprite>();
+			return it->second(this);
 		}
 		else
 		{
-			Logger::LogWarning(4, std::format("Component \"{}\" does not exists", componentName));
+			Logger::LogWarning(4, std::format("Component \"{}\" does not exist", componentName));
 			return luabridge::LuaRef(state);
 		}
 	}
@@ -210,6 +168,15 @@ bool ValidateEntity(const entt::registry& registry, const entt::entity& entity)
 
 void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
+	EntityHelper::RegisterAllComponents<
+		components::AnimatedSprite,
+		components::Background,
+		components::Camera,
+		components::RectTransform,
+		components::Script,
+		components::Sprite,
+		components::Transform>();
+
 	g_env = env;
 
 	auto variableTable = luabridge::newTable(state);

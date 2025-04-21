@@ -1,4 +1,5 @@
 #pragma once
+#include "component.hpp"
 
 namespace components
 {
@@ -20,3 +21,9 @@ namespace components
 		float width = 100;
 	};
 }
+
+template <>
+const std::string ComponentTraits<components::Transform>::name = "Transform";
+
+template <>
+const std::string ComponentTraits<components::RectTransform>::name = "RectTransform";
