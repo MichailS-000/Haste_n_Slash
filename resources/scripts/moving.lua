@@ -23,4 +23,12 @@ function Update()
 		local background = getFirstEntityWithComponent("Background"):getComponent("Background")
 		background.enabled = not background.enabled
 	end
+
+	if (input.getKeyDown("1")) then
+		local transformEntities = getAllEntitiesWithComponent("Transform")
+		
+		for i, entity in ipairs(transformEntities) do
+			print(i)
+		end
+	end
 end

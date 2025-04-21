@@ -20,6 +20,7 @@ private:
 	static inline std::unordered_map<std::string, std::function<void(EntityHelper*)>> removeMap;
 	static inline std::unordered_map<std::string, std::function<luabridge::LuaRef(EntityHelper*)>> addMap;
 	static inline std::unordered_map<std::string, std::function<luabridge::LuaRef(EntityHelper*)>> getMap;
+	static inline std::unordered_map<std::string, std::function<luabridge::LuaRef(entt::registry*, lua_State*)>> getAllMap;
 	static inline std::unordered_map<std::string, std::function<EntityHelper(entt::registry*, lua_State*)>> getEntityMap;
 
 	entt::entity entity;
@@ -27,20 +28,24 @@ private:
 	lua_State* state;
 
 	template<typename T>
-	static void RegisterComponent()
+	static luabridge::LuaRef ReturnAllEntitiesWithComponent(entt::registry* reg, lua_State* state)
 	{
-		std::string name = ComponentTraits<T>::name;
+		luabridge::LuaRef table = luabridge::newTable(state);
 
-		removeMap[name] = [](EntityHelper* self) { self->EraseComponent<T>(); };
-		addMap[name] = [](EntityHelper* self) { return self->ApplyComponent<T>(); };
-		getMap[name] = [](EntityHelper* self) { return self->ReturnComponent<T>(); };
-		getEntityMap[name] = [](entt::registry* reg, lua_State* state) { return GetFirstEntityWithComponent<T>(reg, state); };
+		auto entities = reg->view<T>();
 
-		Logger::Log(std::format("Component \"{}\" registered", name));
+		int i = 1;
+		for (auto [entity, component] : entities.each())
+		{
+			table[i] = EntityHelper(entity, reg, state);
+			i++;
+		}
+
+		return table;
 	}
 
 	template<typename T>
-	static EntityHelper GetFirstEntityWithComponent(entt::registry* reg, lua_State* state)
+	static EntityHelper ReturnFirstEntityWithComponent(entt::registry* reg, lua_State* state)
 	{
 		auto view = reg->view<T>();
 
@@ -54,7 +59,34 @@ private:
 		}
 	}
 
+	template<typename T>
+	static void RegisterComponent()
+	{
+		std::string name = ComponentTraits<T>::name;
+
+		removeMap[name] = [](EntityHelper* self) { self->EraseComponent<T>(); };
+		addMap[name] = [](EntityHelper* self) { return self->ApplyComponent<T>(); };
+		getMap[name] = [](EntityHelper* self) { return self->ReturnComponent<T>(); };
+		getEntityMap[name] = [](entt::registry* reg, lua_State* state) { return ReturnFirstEntityWithComponent<T>(reg, state); };
+		getAllMap[name] = [](entt::registry* reg, lua_State* state) { return ReturnAllEntitiesWithComponent<T>(reg, state); };
+
+		Logger::Log(std::format("Component \"{}\" registered", name));
+	}
+
 public:
+
+	static luabridge::LuaRef GetAllEntitiesWithComponent(entt::registry* reg, lua_State* state, std::string& componentName)
+	{
+		if (auto it = getAllMap.find(componentName); it != getAllMap.end())
+		{
+			return it->second(reg, state);
+		}
+		else
+		{
+			Logger::LogWarning(4, std::format("Component \"{}\" does not exist", componentName));
+			return luabridge::LuaRef(state);
+		}
+	}
 
 	static EntityHelper GetEntityWithComponent(entt::registry* reg, lua_State* state, std::string& componentName)
 	{
@@ -234,6 +266,10 @@ void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 			.addFunction("getFirstEntityWithComponent", [env = env, state = state](std::string componentName) 
 				{
 					return EntityHelper::GetEntityWithComponent(env->applicationRegistry, state, componentName);
+				})
+			.addFunction("getAllEntitiesWithComponent", [env = env, state = state](std::string componentName)
+				{
+					return EntityHelper::GetAllEntitiesWithComponent(env->applicationRegistry, state, componentName);
 				})
 			.addFunction("setVariable", [env = env, variables = variableTable](std::string varName, luabridge::LuaRef value)
 				{
