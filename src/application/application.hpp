@@ -12,7 +12,7 @@ class Application
 {
 private:
 	AudioManager* audio;
-	ScriptsExecutionEnviroment env;
+	ScriptsExecutionEnviroment* env;
 	InputManager* inputManager;
 	ScriptsManager* scriptsManager;
 	ResourceContainer* resources;

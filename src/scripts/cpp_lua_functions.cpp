@@ -25,7 +25,21 @@ bool ValidateEntity(const entt::registry& registry, const entt::entity& entity)
 
 void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
+	auto variableTable = luabridge::newTable(state);
+
 	luabridge::getGlobalNamespace(state)
+		.addFunction("setVariable", [env = env, variables = variableTable](std::string varName, luabridge::LuaRef value)
+			{
+				auto& script = env->applicationRegistry->get<components::Script>(env->currentUpdatingEntity);
+
+				variables[std::format("{}{}", varName, (int)env->currentUpdatingEntity)] = value;
+			})
+		.addFunction("getVariable", [env = env, variables = variableTable](std::string varName)
+			{
+				auto& script = env->applicationRegistry->get<components::Script>(env->currentUpdatingEntity);
+
+				return variables[std::format("{}{}", varName, (int)env->currentUpdatingEntity)];
+			})
 		.beginNamespace("time")
 		.addFunction("getTime", []() 
 			{

@@ -1,6 +1,10 @@
+function Start()
+	setVariable("transform", entity.getComponent(entity.getCurrentEntity(), "Transform"))
+end
+
 function Update()
 	
-	transform = entity.getComponent(entity.getCurrentEntity(), "Transform")
+	transform = getVariable("transform")
 
 	if (input.getKeyDown("W")) then
 		transform.positionY = transform.positionY + 1;

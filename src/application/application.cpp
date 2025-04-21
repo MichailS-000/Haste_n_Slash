@@ -51,14 +51,9 @@ Application::Application()
 	audio = new AudioManager(resourceAccess);
 	Logger::Log("Audio manager created!");
 
-	env = {}; 
-	env.applicationRegistry = &registry;
-	env.currentUpdatingEntity = entt::null;
-	env.input = inputManager;
-	env.resources = resourceAccess;
-	env.audio = audio;
+	env = new ScriptsExecutionEnviroment(&registry, inputManager, resourceAccess, audio);
 
-	scriptsManager = new ScriptsManager(&env);
+	scriptsManager = new ScriptsManager(env);
 
 	loader.LoadResources(renderer->GetSDLRenderer(), scriptsManager);
 
@@ -102,6 +97,7 @@ Application::~Application()
 	delete scriptsManager;
 	delete audio;
 	delete renderer;
+	delete env;
 
 	SDL_DestroyWindow(window);
 	Logger::Log("Application terminated!");
