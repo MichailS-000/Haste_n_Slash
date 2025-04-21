@@ -10,6 +10,7 @@ private:
 	std::map <std::string, SDL_Scancode> registredKeys;
 	std::map <SDL_Scancode, KeyPos> keysState;
 public:
+	bool HasKey(std::string&& key);
 	bool GetKeyUp(std::string&& key);
 	bool GetKeyUp(SDL_Scancode key);
 	bool GetKey(std::string&& key);

@@ -1,13 +1,15 @@
 function Start()
-	setVariable("transform", entity.getComponent(entity.getCurrentEntity(), "Transform"))
+	setVariable("transform", getCurrentEntity():getComponent("Transform"))
+	setVariable("cameraTransform", getFirstEntityWithComponent("Camera"):getComponent("Transform"))
 end
 
 function Update()
-	
-	transform = getVariable("transform")
 
 	if (input.getKeyDown("W")) then
-		transform.positionY = transform.positionY + 1;
+		getVariable("transform"):movePosition(0, 1)
 	end
 
+	if (input.getKeyDown("UP")) then
+		getVariable("cameraTransform"):movePosition(0, 1)
+	end
 end

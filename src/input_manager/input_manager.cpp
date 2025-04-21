@@ -3,6 +3,11 @@
 #define REGISTER_KEY(x) std::pair<std::string, SDL_Scancode>{#x, SDL_SCANCODE_##x}
 #define REGISTER_SPECIAL_KEY(x, y) std::pair<std::string, SDL_Scancode>{#x, SDL_SCANCODE_##y}
 
+bool InputManager::HasKey(std::string&& key)
+{
+	return registredKeys.find(key) != registredKeys.end();
+}
+
 bool InputManager::GetKeyUp(std::string&& key)
 {
 	return keysState[registredKeys[key]] == KeyPos::Up;

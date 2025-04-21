@@ -12,6 +12,142 @@
 #include <unordered_map>
 #include <format>
 
+class EntityHelper
+{
+private:
+	entt::entity entity;
+	entt::registry* registry;
+	lua_State* state;
+public:
+	EntityHelper(entt::entity entity, entt::registry* registry, lua_State* state) : entity(entity), registry(registry), state(state)
+	{
+
+	}
+	
+	int GetId() const
+	{
+		return (int)entity;
+	}
+
+	void Destroy()
+	{
+		registry->destroy(entity);
+	}
+
+	luabridge::LuaRef GetTransform()
+	{
+		return ReturnComponent<components::Transform>();
+	}
+
+	template<typename T>
+	inline luabridge::LuaRef ReturnComponent()
+	{
+		if (registry->all_of<T>(entity))
+		{
+			auto& component = registry->get<T>(entity);
+
+			return luabridge::LuaRef(state, &component);
+		}
+		else
+		{
+			Logger::LogWarning(4, std::format("Entity id: {} does not contains {}", (int)entity, typeid(T).name()));
+			return luabridge::LuaRef(state);
+		}
+	}
+
+	template<typename T>
+	inline luabridge::LuaRef ApplyComponent()
+	{
+		if (!registry->all_of<T>(entity))
+		{
+			auto& component = registry->emplace<T>(entity);
+
+			return luabridge::LuaRef(state, &component);
+		}
+		else
+		{
+			Logger::LogWarning(4, std::format("Entity id: {} already contains {}", (int)entity, typeid(T).name()));
+			return luabridge::LuaRef(state);
+		}
+	}
+
+	luabridge::LuaRef AddComponent(std::string componentName)
+	{
+		if (componentName == "Transform")
+		{
+			return ApplyComponent<components::Transform>();
+		}
+		else if (componentName == "Sprite")
+		{
+			return ApplyComponent<components::Sprite>();
+		}
+		else if (componentName == "Script")
+		{
+			return ApplyComponent<components::Script>();
+		}
+		else if (componentName == "RectTransform")
+		{
+			return ApplyComponent<components::RectTransform>();
+		}
+		else if (componentName == "Camera")
+		{
+			return ApplyComponent<components::Camera>();
+		}
+		else if (componentName == "Background")
+		{
+			return ApplyComponent<components::Background>();
+		}
+		else if (componentName == "AnimatedSprite")
+		{
+			return ApplyComponent<components::AnimatedSprite>();
+		}
+		else
+		{
+			Logger::LogWarning(4, std::format("Component \"{}\" does not exists", componentName));
+			return luabridge::LuaRef(state);
+		}
+	}
+
+	luabridge::LuaRef GetComponent(std::string componentName)
+	{
+		if (componentName == "Transform")
+		{
+			return ReturnComponent<components::Transform>();
+		}
+		else if (componentName == "Sprite")
+		{
+			return ReturnComponent<components::Sprite>();
+		}
+		else if (componentName == "Script")
+		{
+			return ReturnComponent<components::Script>();
+		}
+		else if (componentName == "RectTransform")
+		{
+			return ReturnComponent<components::RectTransform>();
+		}
+		else if (componentName == "Camera")
+		{
+			return ReturnComponent<components::Camera>();
+		}
+		else if (componentName == "Background")
+		{
+			return ReturnComponent<components::Background>();
+		}
+		else if (componentName == "AnimatedSprite")
+		{
+			return ReturnComponent<components::AnimatedSprite>();
+		}
+		else
+		{
+			Logger::LogWarning(4, std::format("Component \"{}\" does not exists", componentName));
+			return luabridge::LuaRef(state);
+		}
+	}
+};
+
+static ScriptsExecutionEnviroment* g_env = nullptr;
+
 template <typename T>
 bool HasComponent(const entt::registry& registry, const entt::entity& entity)
 {
@@ -25,100 +161,97 @@ bool ValidateEntity(const entt::registry& registry, const entt::entity& entity)
 
 void LinkGenericLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
+	g_env = env;
+
 	auto variableTable = luabridge::newTable(state);
 
-	luabridge::getGlobalNamespace(state)
-		.addFunction("setVariable", [env = env, variables = variableTable](std::string varName, luabridge::LuaRef value)
-			{
-				auto& script = env->applicationRegistry->get<components::Script>(env->currentUpdatingEntity);
+	try
+	{
+		luabridge::getGlobalNamespace(state)
+			.beginClass<EntityHelper>("Entity")
+				.addFunction("getID", &EntityHelper::GetId)
+				.addFunction("getComponent", &EntityHelper::GetComponent)
+				.addFunction("addComponent", &EntityHelper::AddComponent)
+				.addFunction("destroy", &EntityHelper::Destroy)
+				.addProperty("transform", [](EntityHelper* entity) { return entity->GetTransform(); })
+			.endClass()
+			.addFunction("addEntity", [env = env, state = state]() 
+				{
+					auto entity = env->applicationRegistry->create();
+					return EntityHelper(entity, env->applicationRegistry, state);
+				})
+			.addFunction("getCurrentEntity", [env = env, state = state]
+				{
+					return EntityHelper(env->currentUpdatingEntity, env->applicationRegistry, state);
+				})
+			.addFunction("getFirstEntityWithComponent", [env = env, state = state](std::string componentName) 
+				{
+					if (componentName == "Camera")
+					{
+						auto view = env->applicationRegistry->view<components::Camera>();
+						return EntityHelper(view.front(), env->applicationRegistry, state);
+					}
 
-				variables[std::format("{}{}", varName, (int)env->currentUpdatingEntity)] = value;
-			})
-		.addFunction("getVariable", [env = env, variables = variableTable](std::string varName)
-			{
-				auto& script = env->applicationRegistry->get<components::Script>(env->currentUpdatingEntity);
+					// TODO: Make for all components
+				})
+			.addFunction("setVariable", [env = env, variables = variableTable](std::string varName, luabridge::LuaRef value)
+				{
+					variables[std::format("{}{}", varName, (int)env->currentUpdatingEntity)] = value;
+				})
+			.addFunction("getVariable", [env = env, variables = variableTable](std::string varName)
+				{
+					return variables[std::format("{}{}", varName, (int)env->currentUpdatingEntity)];
+				})
 
-				return variables[std::format("{}{}", varName, (int)env->currentUpdatingEntity)];
-			})
-		.beginNamespace("time")
-		.addFunction("getTime", []() 
-			{
-				return Time::GetTime();
-			})
-		.addFunction("getDeltaTime", []()
-			{
-				return Time::GetDeltaTime();
-			})
-		.addFunction("selfDestruct", [env = env]() 
-			{
-				env->applicationRegistry->destroy(env->currentUpdatingEntity);
-			})
-		.endNamespace();
+
+			.beginNamespace("time")
+			.addFunction("getTime", []()
+				{
+					return Time::GetTime();
+				})
+			.addFunction("getDeltaTime", []()
+				{
+					return Time::GetDeltaTime();
+				})
+			.addFunction("selfDestruct", [env = env]()
+				{
+					env->applicationRegistry->destroy(env->currentUpdatingEntity);
+				})
+			.endNamespace();
+	}
+	catch (std::logic_error& e)
+	{
+		Logger::LogError(3, std::format("Lua linking error with: {}", e.what()));
+	}
+	catch (luabridge::LuaException& e)
+	{
+		Logger::LogError(3, std::format("Lua linking error with: {}", e.what()));
+	}
 }
 
 void LinkEntityLib(lua_State* state, ScriptsExecutionEnviroment* env)
 {
+	g_env = env;
+
 	luabridge::getGlobalNamespace(state)
 	.beginNamespace("entity")
-		.addFunction("getCurrentEntity", [env = env] 
-			{
-				return (int)env->currentUpdatingEntity;
-			})
-		.addFunction("addEntity", [env = env]() 
-			{
-				return (int)env->applicationRegistry->create();
-			})
-		.addFunction("addScriptToEntity", [env = env](std::string scriptName, int entity) 
-			{
-				if (!ValidateEntity(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Trying to handle invalid entity");
-				}
-
-				components::Script script;
-				script.name = scriptName;
-
-				if (HasComponent<components::Script>(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Entity already contains Script component");
-				}
-				else
-				{
-					env->applicationRegistry->emplace<components::Script>((entt::entity)entity, script);
-				}
-			})
-		.addFunction("destroyEntity", [env = env](int entity) 
-			{
-				env->applicationRegistry->destroy((entt::entity)entity);
-			})
 		.beginClass<components::Transform>("Transform")
 			.addProperty("positionX", &components::Transform::positionX, &components::Transform::positionX)
 			.addProperty("positionY", &components::Transform::positionY, &components::Transform::positionY)
 			.addProperty("scaleX", &components::Transform::scaleX, &components::Transform::scaleX)
 			.addProperty("scaleY", &components::Transform::scaleY, &components::Transform::scaleY)
+			.addFunction("movePosition", [](components::Transform& transform, float x, float y) 
+				{
+					transform.positionX += x;
+					transform.positionY += y;
+				})
 		.endClass()
-		.addFunction("getComponent", [env = env, state = state](int entity, std::string componentName) -> luabridge::LuaRef
-			{
-				if (!ValidateEntity(*env->applicationRegistry, (entt::entity)entity))
-				{
-					throw std::runtime_error("Trying to handle invalid entity");
-				}
-
-				if (componentName == "Transform")
-				{
-					if (!HasComponent<components::Transform>(*env->applicationRegistry, (entt::entity)entity))
-					{
-						throw std::runtime_error(std::format("Entity id:{} does not contains Transform", entity));
-					}
-
-					auto& ptr = env->applicationRegistry->get<components::Transform>((entt::entity)entity);
-
-					return luabridge::LuaRef(state, &ptr);
-				}
-
-				// TODO: Make getters for all components
-
-			})
+		.beginClass<components::Camera>("Camera")
+			.addProperty("scale", &components::Camera::scale, &components::Camera::scale)
+		.endClass()
+		.beginClass<components::Sprite>("Sprite")
+			.addProperty("textureName", &components::Sprite::textureName, &components::Sprite::textureName)
+		.endClass()
 	.endNamespace();
 }
 

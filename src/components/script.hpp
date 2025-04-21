@@ -6,6 +6,6 @@ namespace components
 	struct Script
 	{
 		char initState = 0;
-		std::string name;
+		std::string name = "null";
 	};
 }
